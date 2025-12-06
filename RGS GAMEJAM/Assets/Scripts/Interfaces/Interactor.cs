@@ -10,11 +10,18 @@ public class Interactor : NetworkBehaviour
     [SerializeField] private LayerMask interactionLayer;
 
     [Header("UI")]
-    [SerializeField] private GameObject interactPromptPrefab;
+    [SerializeField] private GameObject tapPromptPrefab;
+    [SerializeField] private GameObject holdPromptPrefab;
     private GameObject promptInstance;
 
     private IInteractable currentInteractable;
     private IInteractable previousInteractable;
+
+    private InteractionType currentType;
+    private bool isHolding = false;
+    private float holdTimer = 0f;
+    private float requiredHoldTime = 0f;
+    public bool isRoomInteract;
 
     private void Awake()
     {
@@ -23,16 +30,70 @@ public class Interactor : NetworkBehaviour
 
     private void Update()
     {
-        if (!isLocalPlayer) return;   
+        if (!isLocalPlayer) return;
+
         UpdateInteractable();
 
-        if (inputHandler.interactionJustPressed && currentInteractable != null)
+        if (currentInteractable == null)
         {
-            if (currentInteractable.CanInteract())
+            isHolding = false;
+            holdTimer = 0f;
+            return;
+        }
+
+        var type = currentInteractable.GetInteractionType();
+
+        // TAP 처리
+        if (type == InteractionType.Tap)
+        {
+            if (inputHandler.interactionJustPressed)
+            {
+                if (isRoomInteract == currentInteractable.isRoomInteractor &&
+                    currentInteractable.CanInteract())
+                {
+                    currentInteractable.Interact(this);
+                }
+            }
+            return;
+        }
+
+        // HOLD 처리
+        requiredHoldTime = currentInteractable.GetHoldTime();
+
+        if (inputHandler.isInteractionPressed)
+        {
+            if (!isHolding)
+            {
+                isHolding = true;
+                holdTimer = 0f;
+            }
+
+            holdTimer += Time.deltaTime;
+
+            UpdateHoldProgressUI(holdTimer / requiredHoldTime);
+
+            if (holdTimer >= requiredHoldTime)
+            {
                 currentInteractable.Interact(this);
+                isHolding = false;
+                holdTimer = 0f;
+            }
+        }
+        else
+        {
+            isHolding = false;
+            holdTimer = 0f;
+            UpdateHoldProgressUI(0f);
         }
     }
+    private void UpdateHoldProgressUI(float progress)
+    {
+        if (promptInstance == null) return;
+        if (currentType != InteractionType.Hold) return;
 
+        var ui = promptInstance.GetComponent<InteractionPromptUI_Hold>();
+        ui.SetFillAmount(Mathf.Clamp01(progress));
+    }
     private void UpdateInteractable()
     {
         if (DoInteractionTest(out IInteractable nearest))
@@ -44,16 +105,13 @@ public class Interactor : NetworkBehaviour
             currentInteractable = null;
         }
 
-        // 상태 변화 감지
         if (previousInteractable != currentInteractable)
         {
-            // 범위에서 나감
             if (previousInteractable != null)
             {
                 previousInteractable.OnExitRange(this);
             }
 
-            // 범위 안으로 들어옴
             if (currentInteractable != null)
             {
                 currentInteractable.OnEnterRange(this);
@@ -62,28 +120,73 @@ public class Interactor : NetworkBehaviour
             previousInteractable = currentInteractable;
         }
 
-        // UI 처리
         if (currentInteractable != null)
-            ShowPrompt(currentInteractable);
+        {
+            if (!currentInteractable.CanInteract())
+            {
+                HidePrompt();
+            }
+            else
+            {
+                ShowPrompt(currentInteractable);
+            }
+        }
         else
+        {
             HidePrompt();
+        }
+
     }
 
     private void ShowPrompt(IInteractable target)
     {
+        if (!target.CanInteract())
+        { 
+            HidePrompt(); 
+            return; 
+        }
+        if (isRoomInteract != target.isRoomInteractor)
+        {
+            HidePrompt();
+            return;
+        }
+
         if (!target.isAppearTransform)
         {
             HidePrompt();
             return;
         }
 
-        if (promptInstance == null)
-            promptInstance = Instantiate(interactPromptPrefab);
+        if (promptInstance == null || currentType != target.GetInteractionType())
+        {
+            if (promptInstance != null)
+                Destroy(promptInstance);
+
+            currentType = target.GetInteractionType();
+
+            if (currentType == InteractionType.Tap)
+                promptInstance = Instantiate(tapPromptPrefab);
+            else
+                promptInstance = Instantiate(holdPromptPrefab);
+        }
 
         promptInstance.SetActive(true);
 
         Transform appear = target.AppearTransform;
         promptInstance.transform.position = appear.position;
+
+        string text = target.GetPromptText();
+
+        if (currentType == InteractionType.Tap)
+        {
+            var ui = promptInstance.GetComponent<InteractPromptUI_NonHold>();
+            ui?.SetText(text);
+        }
+        else
+        {
+            var ui = promptInstance.GetComponent<InteractionPromptUI_Hold>();
+            ui?.SetText(text);
+        }
     }
 
 

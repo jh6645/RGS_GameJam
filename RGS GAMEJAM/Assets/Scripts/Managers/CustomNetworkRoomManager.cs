@@ -1,10 +1,12 @@
 using UnityEngine;
 using Mirror;
 using System.Linq;
+using UnityEngine.SceneManagement;
 public class CustomNetworkRoomManager : NetworkRoomManager
 {
     private RoomSync roomSync;
     private RoomData tempRoomData;
+    private Character tempCharacter;
     public override void Awake()
     {
         base.Awake();
@@ -27,13 +29,73 @@ public class CustomNetworkRoomManager : NetworkRoomManager
     {
         return roomSync.GetRoomData();
     }
+
+    public void SetCharacter(Character character)
+    {
+        tempCharacter = character;
+    }
+    public Character GetCharacter()
+    {
+        return tempCharacter;
+    }
+    //개같은코드
     public override void OnRoomServerSceneChanged(string sceneName)
     {
         base.OnRoomServerSceneChanged(sceneName);
 
-        roomSync = GameObject.Find("RoomManager_Network").GetComponent<RoomSync>();
-        SetRoomData(tempRoomData);
+        if (sceneName == GameplayScene)
+        {
+            foreach (var player in roomSlots.ToList()) 
+            {
+                if (player != null)
+                {
+                    player.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        else if (sceneName == RoomScene)
+        {
+            GameObject roomManagerObj = GameObject.Find("RoomManager_Network");
+            if (roomManagerObj != null)
+            {
+                roomSync = roomManagerObj.GetComponent<RoomSync>();
+                SetRoomData(tempRoomData);
+            }
+
+            foreach (var player in roomSlots.ToList())
+            {
+                if (player != null)
+                {
+                    player.gameObject.SetActive(true);
+                }
+            }
+        }
     }
+    public override void OnRoomClientSceneChanged()
+    {
+        base.OnRoomClientSceneChanged();
+
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName == "GameScene")
+        {
+            foreach (var player in roomSlots.ToList())
+            {
+                if (player != null)
+                    player.gameObject.SetActive(false);
+            }
+        }
+        else if (sceneName == "Lobby")
+        {
+            foreach (var player in roomSlots.ToList())
+            {
+                if (player != null)
+                    player.gameObject.SetActive(true);
+            }
+        }
+    }
+    //개같은코드 끝
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
@@ -52,11 +114,8 @@ public class CustomNetworkRoomManager : NetworkRoomManager
             ServerChangeScene(GameplayScene);
         }
     }
+    
     public override void OnRoomServerPlayersReady()
     {
-    }
-    public void ChangeCharacter(Character character)
-    {
-
     }
 }

@@ -51,6 +51,7 @@ public class RoomManager : MonoBehaviour
             roomNameField.enabled = false;
             roomChangeBtn.enabled = false;
         }
+
     }
 
     private void Update()
@@ -74,12 +75,12 @@ public class RoomManager : MonoBehaviour
     {
         if (readyState)
         {
-            clientReadyTxt.text = "READY";
+            clientReadyTxt.text = "준비완료";
             clientReadyTxt.color = Color.blue;
         }
         else
         {
-            clientReadyTxt.text = "Press SPACE to Ready";
+            clientReadyTxt.text = "스페이스키를 눌러 준비하세요";
             clientReadyTxt.color = Color.white;
         }
     }
@@ -121,7 +122,6 @@ public class RoomManager : MonoBehaviour
         roomSetPanel.SetActive(true);
         charSelPanel.SetActive(false);
     }
-
     public void OnCharacterChanged(int charNum)
     {
         for (int i = 0; i < charactSelTexts.Length; i++)
@@ -129,6 +129,7 @@ public class RoomManager : MonoBehaviour
             charactSelTexts[i].text = "";
         }
         charactSelTexts[charNum].text = "O";
-        RoomPlayer.localPlayer.CharacterChange((Character)charNum);
+        ((CustomNetworkRoomManager)NetworkManager.singleton).SetCharacter((Character)charNum);
+        RoomPlayer.localRoomPlayer.CharacterChange((Character)charNum);
     }
 }

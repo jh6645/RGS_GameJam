@@ -11,8 +11,8 @@ public class CustomNetworkRoomPlayer : NetworkRoomPlayer
 
     private void Awake()
     {
-        playerInputHandler = GetComponent<PlayerInputHandler>();   
-        roomManager=GameObject.Find("RoomManager").GetComponent<RoomManager>();  
+        playerInputHandler = GetComponent<PlayerInputHandler>();
+        roomManager=GameObject.Find("RoomManager")?.GetComponent<RoomManager>();
     }
     public override void Start()
     {
@@ -66,6 +66,8 @@ public class CustomNetworkRoomPlayer : NetworkRoomPlayer
     {
         base.ReadyStateChanged(oldReadyState, newReadyState);
     }
+
+
 
 
 }

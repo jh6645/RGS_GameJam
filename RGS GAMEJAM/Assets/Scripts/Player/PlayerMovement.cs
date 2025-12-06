@@ -1,4 +1,5 @@
 using Mirror;
+using Telepathy;
 using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
@@ -33,6 +34,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
         if (PlayerInputLock.IsLocked) return;
+        if (!NetworkClient.ready) return;
+
         Vector2 move = inputs.movementInput.normalized;
         //내꺼이동
         bool localWalking = !(move.x == 0 && move.y == 0);

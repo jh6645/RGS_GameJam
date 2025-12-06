@@ -9,7 +9,10 @@ public class DoorInteraction : MonoBehaviour, IInteractable
     [SerializeField] private GameObject magicDoorPanel;
     public Transform AppearTransform => useAppearTransform && appearTransform != null ? appearTransform : transform;
     public bool isAppearTransform => useAppearTransform && appearTransform != null;
-
+    public bool isRoomInteractor => true;
+    public InteractionType GetInteractionType() => InteractionType.Tap;
+    public float GetHoldTime() => 0f;
+    public string GetPromptText() => "¹® ¿­±â";
     public bool CanInteract()
     {
         return true;
@@ -22,11 +25,17 @@ public class DoorInteraction : MonoBehaviour, IInteractable
 
     public void OnEnterRange(Interactor interactor)
     {
-        magicDoorPanel.SetActive(true);
+        if (magicDoorPanel != null) {
+            magicDoorPanel.SetActive(true);
+        }
+
     }
 
     public void OnExitRange(Interactor interactor)
     {
-        magicDoorPanel.SetActive(false);
+        if (magicDoorPanel != null)
+        {
+            magicDoorPanel.SetActive(false);
+        }
     }
 }

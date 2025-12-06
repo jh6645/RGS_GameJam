@@ -1,5 +1,10 @@
 using UnityEngine;
 
+public enum InteractionType
+{
+    Tap, 
+    Hold 
+}
 public interface IInteractable
 {
     public bool CanInteract();
@@ -10,4 +15,8 @@ public interface IInteractable
 
     public Transform AppearTransform { get; }
     public bool isAppearTransform { get; }
+    public bool isRoomInteractor { get; }
+    public InteractionType GetInteractionType();
+    public float GetHoldTime();
+    public string GetPromptText();
 }

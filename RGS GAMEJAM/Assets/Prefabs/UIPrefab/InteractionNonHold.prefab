@@ -65,10 +65,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPACE
+  m_text: "\uC2A4\uD398\uC774\uC2A4"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 277dad103b689ed4d9f57639fc613530, type: 2}
+  m_sharedMaterial: {fileID: 8328992825135115306, guid: 277dad103b689ed4d9f57639fc613530, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -172,8 +172,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.15}
-  m_SizeDelta: {x: 1.25, y: 0.4}
+  m_AnchoredPosition: {x: 0, y: 0.1625}
+  m_SizeDelta: {x: 1.27, y: 0.37499}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5726187470463046394
 CanvasRenderer:
@@ -225,8 +225,9 @@ GameObject:
   - component: {fileID: 5841442136261958151}
   - component: {fileID: 7662658705370182468}
   - component: {fileID: 3325821894925754885}
+  - component: {fileID: 2598932287055850614}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: InteractionNonHold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -241,7 +242,7 @@ RectTransform:
   m_GameObject: {fileID: 7017691658143864487}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7369491074354111441}
@@ -250,7 +251,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 2.277, y: -0.538}
+  m_AnchoredPosition: {x: 2.277008, y: -0.5379944}
   m_SizeDelta: {x: 1.461, y: 0.7972}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5841442136261958151
@@ -316,6 +317,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &2598932287055850614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7017691658143864487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6d38869f5ed224a8d0bc6c85bc3257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractPromptUI_NonHold
+  promptText: {fileID: 993377161619213154}
 --- !u!1 &7603027043509427716
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,7 +366,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -0.15}
-  m_SizeDelta: {x: 1.1639, y: 0.25}
+  m_SizeDelta: {x: 1.45, y: 0.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5457473307950797058
 CanvasRenderer:
@@ -457,10 +471,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: to interact
+  m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 52e50c98e7d89994e8ba257ea84f4e36, type: 2}
+  m_sharedMaterial: {fileID: -7998869907747771072, guid: 52e50c98e7d89994e8ba257ea84f4e36, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
