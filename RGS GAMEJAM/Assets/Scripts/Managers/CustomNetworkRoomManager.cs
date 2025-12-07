@@ -4,17 +4,39 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 public class CustomNetworkRoomManager : NetworkRoomManager
 {
+    [SerializeField] private SO_EnemyDataBase database;
     private RoomSync roomSync;
     private RoomData tempRoomData;
     private Character tempCharacter;
-    public override void Awake()
+    public override void OnStartClient()
     {
-        base.Awake();
+        base.OnStartClient();
 
-    }
-    public override void Start()
-    {
-        base.Start();
+        foreach (var entry in database.enemies)
+        {
+            var prefab = entry.prefab;
+
+            NetworkClient.RegisterPrefab(
+                prefab,
+                (SpawnMessage msg) =>
+                {
+                    GameObject obj = GameManager.Instance.poolManager.Get(prefab);
+                    obj.transform.SetPositionAndRotation(msg.position, msg.rotation);
+
+                    var p = obj.GetComponent<PooledEnemy>();
+                    p.enemyType = entry.type;
+                    p.originalPrefab = prefab;
+                    p.OnSpawnFromPool();
+
+                    return obj;
+                },
+                (GameObject obj) =>
+                {
+                    var p = obj.GetComponent<PooledEnemy>();
+                    GameManager.Instance.poolManager.Return(p.originalPrefab ?? prefab, obj);
+                }
+            );
+        }
     }
 
     public void SetTempRoomData(RoomData roomData) {

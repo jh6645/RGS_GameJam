@@ -19,29 +19,17 @@ public class WorkbenchInteraction : MonoBehaviour, IInteractable
     [SerializeField] private Transform content;
     [SerializeField] private GameObject towerUI;
 
-    [Header("Tower Data")]
-    [SerializeField] private SO_BaseTower[] towerDataArray;
-
     private Dictionary<TowerType, bool> isRegisteredTowerDict;
-    private Dictionary<TowerType, SO_BaseTower> towerDataDict;
+   
 
     private void Awake()
     {
         isRegisteredTowerDict = new Dictionary<TowerType, bool>();
-        towerDataDict = new Dictionary<TowerType, SO_BaseTower>();
 
         foreach (TowerType type in Enum.GetValues(typeof(TowerType)))
             isRegisteredTowerDict[type] = false;
 
-        foreach (var data in towerDataArray)
-        {
-            if (data == null) continue;
 
-            if (!towerDataDict.ContainsKey(data.towerType))
-                towerDataDict.Add(data.towerType, data);
-            else
-                Debug.LogWarning($"중복된 타워 타입: {data.towerType}");
-        }
     }
 
     public bool CanInteract() => true;
@@ -60,15 +48,16 @@ public class WorkbenchInteraction : MonoBehaviour, IInteractable
             if (!towerInfo.Value) continue;
             if (isRegisteredTowerDict[towerInfo.Key]) continue;
 
-            if (!towerDataDict.ContainsKey(towerInfo.Key))
+            if (!GameManager.Instance.towerManager.towerDataDict.ContainsKey(towerInfo.Key))
             {
                 Debug.LogError($"NO {towerInfo.Key}");
                 continue;
             }
 
-            // UI 생성
             GameObject go = Instantiate(towerUI, content);
-            go.GetComponent<TowerInfoUI>().SetTowerInfo(towerDataDict[towerInfo.Key]);
+            go.GetComponent<TowerInfoUI>().SetTowerInfo(GameManager.Instance.towerManager.towerDataDict[towerInfo.Key], () => {
+                CustomNetworkGamePlayer.localPlayer.playerTower.AddTower(GameManager.Instance.towerManager.towerDataDict[towerInfo.Key]);
+            });
 
             isRegisteredTowerDict[towerInfo.Key] = true;
         }

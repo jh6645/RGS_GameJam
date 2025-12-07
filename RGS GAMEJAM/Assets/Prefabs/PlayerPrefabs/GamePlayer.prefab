@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1120894728695824572}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.038, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -449,7 +449,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 7482667652216324306, guid: 0cca11edd44666b458e86ebb93cf9d56, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -479,6 +479,7 @@ GameObject:
   - component: {fileID: 5139909609544389373}
   - component: {fileID: 8995529992261632134}
   - component: {fileID: 7600196819990560385}
+  - component: {fileID: 1975245369292562829}
   m_Layer: 6
   m_Name: GamePlayer
   m_TagString: Untagged
@@ -749,7 +750,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  moveSpeed: 2
+  moveSpeed: 2.5
+  towerMoveSpeed: 1.5
+  isRoomPlayer: 0
 --- !u!114 &-4298250654952913505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -800,7 +803,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   interactionPos: {fileID: 7207532486829482350}
-  interactionRange: {x: 1, y: 0.85}
+  interactionRange: {x: 1, y: 1}
   interactionLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -828,6 +831,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 9100000, guid: f38ec307bc895ec498ef527cae05d66e, type: 2}
   - {fileID: 0}
+  playerTower: {fileID: 0}
+  playerMovement: {fileID: 0}
 --- !u!114 &7600196819990560385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -848,3 +853,20 @@ MonoBehaviour:
   maxZoom: 6
   cameraMoveSpeed: 10
   edgeThickness: 20
+--- !u!114 &1975245369292562829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8255203102187795411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b9f4324a00c304d88099f361bbe873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTower
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  towerImg: {fileID: 2346789405177177392}
+  isMovingTower: 0

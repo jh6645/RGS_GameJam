@@ -19,7 +19,7 @@ public class GridRenderer : MonoBehaviour
 
     [Header("Highlight")]
     public GameObject highlightPrefab;
-    private GameObject highlightInstance;
+    [HideInInspector] public GameObject highlightInstance;
 
     private GameObject gridParent;
 
@@ -41,7 +41,6 @@ public class GridRenderer : MonoBehaviour
     private void CreateHighlightCell()
     {
         highlightInstance = Instantiate(highlightPrefab, transform);
-        highlightInstance.transform.localScale = new Vector3(cellSize, cellSize, 1f);
         highlightInstance.SetActive(false);
     }
     private void ApplyGridState()
@@ -116,16 +115,35 @@ public class GridRenderer : MonoBehaviour
         gridOffset = offset;
         ApplyOffset();
     }
-    public void HighlightCell(int x, int y)
-    {
-        if (x < 0 || x >= gridSizeX || y < 0 || y >= gridSizeY)
-        {
-            highlightInstance.SetActive(false);
-            return;
-        }
 
-        Vector3 pos = ToIsometric(new Vector3((x + 0.5f) * cellSize, 0, (y + 0.5f) * cellSize));
-        highlightInstance.transform.localPosition = pos + gridOffset;
+    private Vector2 ToIsometric2D(Vector2 pos)
+    {
+        float isoX = pos.x + 2 * pos.y;
+        float isoY = 2 * pos.y - pos.x;
+        return new Vector2(isoX, isoY);
+    }
+
+
+    private Vector2 ToCartesian2D(float isoX, float isoY)
+    {
+        float cartX = (isoX - isoY) / 2f;
+        float cartY = (isoX + isoY) / 4f;
+        return new Vector2(cartX, cartY);
+    }
+
+    public Vector2 HighlightCell(Vector2 cartPos)
+    {
+        Vector2 isoPos = ToIsometric2D(cartPos);
+
+        float nearestIsoX = Mathf.CeilToInt(isoPos.x)+0.5f;
+        float nearestIsoY = Mathf.CeilToInt(isoPos.y)+0.5f;
+
+        Vector2 snappedCart = ToCartesian2D(nearestIsoX, nearestIsoY);
+
+        // 최종적으로 cart -> 화면위치에서 cellSize를 한 번만 적용
+        highlightInstance.transform.localPosition = new Vector2(snappedCart.x, snappedCart.y-0.5f);
+
         highlightInstance.SetActive(true);
+        return new Vector2(snappedCart.x, snappedCart.y - 0.5f);
     }
 }

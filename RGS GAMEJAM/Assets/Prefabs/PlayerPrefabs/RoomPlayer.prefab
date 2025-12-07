@@ -726,6 +726,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   moveSpeed: 2
+  towerMoveSpeed: 3
+  isRoomPlayer: 1
 --- !u!114 &-4298250654952913505
 MonoBehaviour:
   m_ObjectHideFlags: 0

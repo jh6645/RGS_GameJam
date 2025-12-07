@@ -13,8 +13,8 @@ public class CustomNetworkGamePlayer : NetworkBehaviour
     [SyncVar(hook = nameof(OnStoneChanged))] private int localStone = 0;
 
     private Animator playerAnimator;
-    private PlayerTower playerTower;
-    private PlayerMovement playerMovement;
+    [HideInInspector] public PlayerTower playerTower;
+    [HideInInspector] public PlayerMovement playerMovement;
 
     private void Awake()
     {

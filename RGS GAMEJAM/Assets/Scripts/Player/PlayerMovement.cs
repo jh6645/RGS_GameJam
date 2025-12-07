@@ -17,17 +17,25 @@ public class PlayerMovement : NetworkBehaviour
     private float vertical;
 
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float towerMoveSpeed = 3f;
+    [SerializeField] private bool isRoomPlayer;
     private Rigidbody2D rb;
     private Animator Anim;
     private PlayerInputHandler inputs;
     private SpriteRenderer SR;
+    private CustomNetworkGamePlayer player;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         inputs = GetComponent<PlayerInputHandler>();
-        Anim=GetComponentInChildren<Animator>();
-        SR=GetComponentInChildren<SpriteRenderer>();
+        Anim = GetComponentInChildren<Animator>();
+        SR = GetComponentInChildren<SpriteRenderer>();
+        if (!isRoomPlayer)
+        {
+            player = GetComponent<CustomNetworkGamePlayer>();
+        }
+
     }
 
     private void Update()
@@ -54,7 +62,15 @@ public class PlayerMovement : NetworkBehaviour
         if (move.x > 0.1f) SR.flipX = true;
         else if (move.x < -0.1f) SR.flipX = false;
 
-        rb.MovePosition(rb.position + move * moveSpeed * Time.fixedDeltaTime);
+        if (isRoomPlayer)
+        {
+            rb.MovePosition(rb.position + move * moveSpeed * Time.fixedDeltaTime);
+        }
+        else
+        {
+            rb.MovePosition(rb.position + move * (player.playerTower.isMovingTower ? towerMoveSpeed : moveSpeed) * Time.fixedDeltaTime);
+        }
+
     }
 
     [Command]
