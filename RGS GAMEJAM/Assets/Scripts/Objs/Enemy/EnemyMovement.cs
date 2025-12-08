@@ -2,20 +2,14 @@ using UnityEngine;
 using Mirror;
 public class EnemyMovement : NetworkBehaviour
 {
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float agroRange = 5f;
-
     private Rigidbody2D rb;
     private Transform mainTarget;
-    private Transform currentTarget;
-
-    [SerializeField] private LayerMask towerLayer;
-    [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private bool agroPlayer;
-    [SerializeField] private bool agroTower;
+    [HideInInspector] public Transform currentTarget;
+    private EnemyCore Core;
 
     private void Awake()
     {
+        Core = GetComponent<EnemyCore>();
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -41,7 +35,7 @@ public class EnemyMovement : NetworkBehaviour
             dir = (mainTarget.position - transform.position).normalized; 
         }
 
-        rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + dir * Core.enemyData.moveSpeed * Time.fixedDeltaTime);
     }
 
     private void UpdateAgroTarget()
@@ -49,9 +43,9 @@ public class EnemyMovement : NetworkBehaviour
         Transform nearest = null;
         float nearestDist = Mathf.Infinity;
 
-        if (agroTower)
+        if (Core.enemyData.isAgroTower)
         {
-            Collider2D[] col_tower = Physics2D.OverlapCircleAll(transform.position, agroRange, towerLayer);
+            Collider2D[] col_tower = Physics2D.OverlapCircleAll(transform.position, Core.enemyData.agroRange, Core.enemyData.towerLayer);
 
             foreach (var col in col_tower)
             {
@@ -64,9 +58,9 @@ public class EnemyMovement : NetworkBehaviour
             }
         }
 
-        if (agroPlayer)
+        if (Core.enemyData.isAgroPlayer)
         {
-            Collider2D[] col_player = Physics2D.OverlapCircleAll(transform.position, agroRange, playerLayer);
+            Collider2D[] col_player = Physics2D.OverlapCircleAll(transform.position, Core.enemyData.agroRange, Core.enemyData.playerLayer);
 
             foreach (var col in col_player)
             {
@@ -84,7 +78,7 @@ public class EnemyMovement : NetworkBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, agroRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, Core.enemyData.agroRange);
     }
 }

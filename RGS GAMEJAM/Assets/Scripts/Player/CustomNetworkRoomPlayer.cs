@@ -51,7 +51,7 @@ public class CustomNetworkRoomPlayer : NetworkRoomPlayer
     public override void OnClientEnterRoom()
     {
         base.OnClientEnterRoom();
-        playerNumTxt.text = "P" + (1+index).ToString();
+        playerNumTxt.text = "P" + (1 + index).ToString();
         if (index == 0)
         {
             isHostImg.SetActive(true);
@@ -59,6 +59,10 @@ public class CustomNetworkRoomPlayer : NetworkRoomPlayer
         else
         {
             isHostImg.SetActive(false);
+        }
+        if (isLocalPlayer)
+        {
+            ((CustomNetworkRoomManager)NetworkManager.singleton).SetIndex(index + 1);
         }
     }
 

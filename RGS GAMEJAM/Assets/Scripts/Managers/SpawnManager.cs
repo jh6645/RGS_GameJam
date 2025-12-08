@@ -2,29 +2,25 @@ using UnityEngine;
 using Mirror;
 public class SpawnManager : NetworkBehaviour
 {
-    [SerializeField] private SO_EnemyDataBase database;
-
+    public GameObject[] enemies;
+    public GameObject dmgIndicator;
+    [SerializeField] private PoolManager poolManager;
+    private void Awake()
+    {
+    }
     public override void OnStartServer()
     {
         base.OnStartServer();
-        SpawnByType(EnemyType.NormalPerson, new Vector3(20, 20));
+        poolManager.Spawn<PooledEnemy>(enemies[0], new Vector2(15, 15));
     }
+    #region SpawnDmgIndicator
     [Server]
-    public void SpawnByType(EnemyType type, Vector3 pos)
+    public void SpawnDmgIndicator(Vector2 position, int damage)
     {
-        GameObject prefab = database.GetPrefab(type);
-        GameObject instance = GameManager.Instance.poolManager.Get(prefab);
-
-        instance.transform.position = pos;
-        instance.transform.rotation = Quaternion.identity;
-
-        var p = instance.GetComponent<PooledEnemy>();
-        p.enemyType = type;
-        p.originalPrefab = prefab;
-
-        NetworkServer.Spawn(instance);
-
-        p.OnSpawnFromPool();
+        PooledDamageIndicator PDI = poolManager.Spawn<PooledDamageIndicator>(dmgIndicator, position);
+        PDI.SetIndicator(damage);
     }
+    #endregion
+
 
 }

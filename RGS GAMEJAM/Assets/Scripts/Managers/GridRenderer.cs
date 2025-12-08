@@ -131,7 +131,7 @@ public class GridRenderer : MonoBehaviour
         return new Vector2(cartX, cartY);
     }
 
-    public Vector2 HighlightCell(Vector2 cartPos)
+    public Vector2Int HighlightCell(Vector2 cartPos)
     {
         Vector2 isoPos = ToIsometric2D(cartPos);
 
@@ -144,6 +144,6 @@ public class GridRenderer : MonoBehaviour
         highlightInstance.transform.localPosition = new Vector2(snappedCart.x, snappedCart.y-0.5f);
 
         highlightInstance.SetActive(true);
-        return new Vector2(snappedCart.x, snappedCart.y - 0.5f);
+        return new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
     }
 }

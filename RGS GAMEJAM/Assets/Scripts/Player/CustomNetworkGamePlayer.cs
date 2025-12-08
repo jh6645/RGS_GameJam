@@ -1,13 +1,17 @@
 using UnityEngine;
 using Mirror;
+using TMPro;
 public class CustomNetworkGamePlayer : NetworkBehaviour
 {
     public static CustomNetworkGamePlayer localPlayer;
 
-    [SyncVar(hook = nameof(OnCharacterChanged))]
-    [SerializeField] private Character currentCharacter;
-
     [SerializeField] private RuntimeAnimatorController[] characterACs;
+    [SerializeField] private TMP_Text playerNameTxt;
+
+    [SerializeField] private Color[] playerNameColorList = new Color[4];
+
+    [SyncVar(hook =nameof(OnIndexChanged))] private int index = 0;
+    [SyncVar(hook = nameof(OnCharacterChanged))] private Character currentCharacter;
 
     [SyncVar(hook = nameof(OnStickChanged))] private int localStick = 0;
     [SyncVar(hook = nameof(OnStoneChanged))] private int localStone = 0;
@@ -33,6 +37,7 @@ public class CustomNetworkGamePlayer : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
         CharacterChange(((CustomNetworkRoomManager)NetworkManager.singleton).GetCharacter());
+        CmdSetIndex(((CustomNetworkRoomManager)NetworkManager.singleton).GetIndex());
         localPlayer = this;
     }
 
@@ -123,5 +128,20 @@ public class CustomNetworkGamePlayer : NetworkBehaviour
             localStone--;
             GameManager.Instance.resourceManager.ServerAddStone(1);
         }
+    }
+    [Command]
+    private void CmdSetIndex(int idx)
+    {
+        ServerSetIndex(idx);
+    }
+    [Server]
+    private void ServerSetIndex(int idx)
+    {
+        index = idx;
+    }
+    private void OnIndexChanged(int oldValue, int newValue)
+    {
+        playerNameTxt.text = "P" + newValue.ToString();
+        playerNameTxt.color = playerNameColorList[newValue-1];
     }
 }

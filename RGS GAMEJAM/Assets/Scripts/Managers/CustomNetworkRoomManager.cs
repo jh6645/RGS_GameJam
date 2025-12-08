@@ -4,15 +4,16 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 public class CustomNetworkRoomManager : NetworkRoomManager
 {
-    [SerializeField] private SO_EnemyDataBase database;
+    [SerializeField] private SO_PoolableDB database;
     private RoomSync roomSync;
     private RoomData tempRoomData;
     private Character tempCharacter;
+    private int tempIndex;
     public override void OnStartClient()
     {
         base.OnStartClient();
 
-        foreach (var entry in database.enemies)
+        foreach (var entry in database.poolables)
         {
             var prefab = entry.prefab;
 
@@ -23,17 +24,16 @@ public class CustomNetworkRoomManager : NetworkRoomManager
                     GameObject obj = GameManager.Instance.poolManager.Get(prefab);
                     obj.transform.SetPositionAndRotation(msg.position, msg.rotation);
 
-                    var p = obj.GetComponent<PooledEnemy>();
-                    p.enemyType = entry.type;
-                    p.originalPrefab = prefab;
-                    p.OnSpawnFromPool();
+                    var pooledObj = obj.GetComponent<BasePooledObject>();
+                    pooledObj.originalPrefab = prefab;
+                    pooledObj.OnSpawnFromPool();
 
                     return obj;
                 },
                 (GameObject obj) =>
                 {
-                    var p = obj.GetComponent<PooledEnemy>();
-                    GameManager.Instance.poolManager.Return(p.originalPrefab ?? prefab, obj);
+                    var pooledObj = obj.GetComponent<BasePooledObject>();
+                    GameManager.Instance.poolManager.Return(pooledObj.originalPrefab ?? prefab, obj);
                 }
             );
         }
@@ -60,6 +60,14 @@ public class CustomNetworkRoomManager : NetworkRoomManager
     {
         return tempCharacter;
     }
+    public void SetIndex(int name) {
+        tempIndex = name;
+    }
+    public int GetIndex()
+    {
+        return tempIndex;
+    }
+
     //개같은코드
     public override void OnRoomServerSceneChanged(string sceneName)
     {

@@ -1,26 +1,29 @@
 using UnityEngine;
 using Mirror;
-public class PooledEnemy : NetworkBehaviour
+public class BasePooledObject : NetworkBehaviour
 {
-    [HideInInspector] public EnemyType enemyType;
     [HideInInspector] public GameObject originalPrefab;
 
-    public void OnSpawnFromPool()
+    public virtual void OnSpawnFromPool()
     {
         gameObject.SetActive(true);
-        // 여기서 초기화 ㄱㄱ
+    }
+    public virtual void OnDespawnFromPool()
+    {
+
     }
 
     [Server]
     public void ServerDespawn()
     {
-        NetworkServer.UnSpawn(gameObject);
         RpcReturnToPool();
+        NetworkServer.UnSpawn(gameObject);
     }
 
     [ClientRpc]
     void RpcReturnToPool()
     {
+        OnDespawnFromPool();
         GameManager.Instance.poolManager.Return(originalPrefab, gameObject);
     }
 }

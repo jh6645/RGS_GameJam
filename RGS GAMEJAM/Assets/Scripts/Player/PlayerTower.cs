@@ -6,7 +6,7 @@ public class PlayerTower : NetworkBehaviour
     [SerializeField] private Image towerImg;
     [SyncVar(hook =nameof(OnTowerChanged))] public bool isMovingTower = false;
     [SyncVar] private TowerType nowTowerType;
-    private Vector2 selectedCell;
+    private Vector2Int selectedCell;
     
     private void Start()
     {
@@ -19,6 +19,7 @@ public class PlayerTower : NetworkBehaviour
         {
             var grid = GameManager.Instance.gridRenderer;
             selectedCell = grid.HighlightCell(new Vector2(transform.position.x, transform.position.y-0.35f));
+            Debug.Log(selectedCell);
         }
 
     }
