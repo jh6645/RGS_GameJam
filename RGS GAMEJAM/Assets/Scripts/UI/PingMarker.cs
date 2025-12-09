@@ -3,12 +3,11 @@ using Mirror;
 
 public class PingMarker : NetworkBehaviour
 {
-    // 타입이 바뀔 때마다 클라에서 스프라이트 갱신되도록 hook 달기
     [SyncVar(hook = nameof(OnTypeChanged))]
     public PingType Type;
 
     [Header("Renderer")]
-    [SerializeField] private SpriteRenderer spriteRenderer;   // 자식 Renderer에 있는 SpriteRenderer
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     [Header("Sprites")]
     [SerializeField] private Sprite defendSprite;   // 위 (DefendMf)
@@ -21,19 +20,17 @@ public class PingMarker : NetworkBehaviour
 
     private void Awake()
     {
-        // 인스펙터에서 안 넣어줬으면 자식에서 자동으로 찾기
         if (spriteRenderer == null)
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    // 서버에서만 수명 타이머 돌리기
     public override void OnStartServer()
     {
         base.OnStartServer();
-        Invoke(nameof(DestroySelf), lifetime);
+        // 서버에서만 수명 타이머 돌리고, 끝나면 네트워크 오브젝트 파괴
+        Invoke(nameof(DespawnSelf), lifetime);
     }
 
-    // 클라이언트에서 처음 스폰될 때 현재 Type 값으로 한 번 초기화
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -45,7 +42,6 @@ public class PingMarker : NetworkBehaviour
         CancelInvoke();
     }
 
-    // SyncVar hook
     private void OnTypeChanged(PingType oldType, PingType newType)
     {
         UpdateSprite(newType);
@@ -63,15 +59,12 @@ public class PingMarker : NetworkBehaviour
             case PingType.DefendMf:
                 spriteRenderer.sprite = defendSprite;
                 break;
-
             case PingType.OnMyWay:
                 spriteRenderer.sprite = onMyWaySprite;
                 break;
-
             case PingType.AssistMe:
                 spriteRenderer.sprite = assistSprite;
                 break;
-
             case PingType.Missing:
                 spriteRenderer.sprite = missingSprite;
                 break;
@@ -79,7 +72,7 @@ public class PingMarker : NetworkBehaviour
     }
 
     [Server]
-    private void DestroySelf()
+    private void DespawnSelf()
     {
         NetworkServer.Destroy(gameObject);
     }

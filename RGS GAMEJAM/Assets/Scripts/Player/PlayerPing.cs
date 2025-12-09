@@ -147,7 +147,6 @@ public class PlayerPing : NetworkBehaviour
     [Command]
     private void CmdSpawnPing(Vector3 position, PingType type)
     {
-        Debug.Log($"[PING] CmdSpawnPing pos={position}, type={type}");
         GameObject obj = Instantiate(pingPrefab, position, Quaternion.identity);
 
         PingMarker marker = obj.GetComponent<PingMarker>();
