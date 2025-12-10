@@ -1,9 +1,8 @@
 using Mirror;
 using TMPro;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.UI;
-public class TreeInteraction : MonoBehaviour, IInteractable
+public class TreeInteraction : NetworkBehaviour, IInteractable
 {
     [Header("UI Prompt")]
     [SerializeField] private Transform appearTransform;
@@ -26,6 +25,12 @@ public class TreeInteraction : MonoBehaviour, IInteractable
     [SerializeField] private SO_Tree treeData;
     [SerializeField] private MainTree mainTree;
 
+    public GameObject Obj => gameObject;
+    [SyncVar] public bool isLocked;
+
+    public bool IsLocked { get => isLocked; set => isLocked = value; }
+    [SyncVar] private NetworkIdentity lockedBy;
+    public NetworkIdentity LockedBy { get => lockedBy; set => lockedBy = value; }
     public Transform AppearTransform => useAppearTransform && appearTransform != null ? appearTransform : transform;
     public bool isAppearTransform => useAppearTransform && appearTransform != null;
     public bool isRoomInteractor => false;
@@ -33,15 +38,22 @@ public class TreeInteraction : MonoBehaviour, IInteractable
     public float GetHoldTime() => treeInteractionTime;
     public string GetPromptText() => "나뭇가지 얻기";
 
-    public bool CanInteract()
+    public bool CanInteract(Interactor interactor)
     {
+        NetworkIdentity playerId;
+        if (isServer)
+            playerId = interactor.connectionToClient?.identity;
+        else
+            playerId = interactor.netIdentity;
+        if (IsLocked && LockedBy != playerId)
+            return false;
         if (NetworkTime.time < mainTree.GetLastInteractionTime() + mainTree.GetInteractionCoolDown())
             return false;
 
         return true;
     }
 
-    public bool Interact(Interactor interactor)
+    public bool InteractClient(Interactor interactor)
     {
         CustomNetworkGamePlayer.localPlayer.CmdTryGetStick();
         return true;
@@ -74,5 +86,10 @@ public class TreeInteraction : MonoBehaviour, IInteractable
         if (treePanel != null) {
             treePanel.SetActive(false);
         }
+    }
+    [Server]
+    public bool InteractServer(Interactor interactor)
+    {
+        return true;
     }
 }

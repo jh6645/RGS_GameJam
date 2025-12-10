@@ -1,4 +1,4 @@
-using Mirror;
+﻿using Mirror;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +10,7 @@ public class PoolManager : MonoBehaviour
     public GameObject Get(GameObject originalPrefab)
     {
         if (!pools.ContainsKey(originalPrefab)) pools[originalPrefab] = new Queue<GameObject>();
-
+        /*
         var q = pools[originalPrefab];
         if (q.Count > 0)
         {
@@ -18,7 +18,7 @@ public class PoolManager : MonoBehaviour
             obj.SetActive(true);
             return obj;
         }
-
+        */
         var go = Instantiate(originalPrefab);
         var p = go.GetComponent<BasePooledObject>();
         if (p != null) p.originalPrefab = originalPrefab;
@@ -37,6 +37,7 @@ public class PoolManager : MonoBehaviour
     {
         GameObject instance = GameManager.Instance.poolManager.Get(prefab);
         instance.transform.SetPositionAndRotation(pos, rot);
+
         T pooledObj = instance.GetComponent<T>();
         pooledObj.originalPrefab = prefab;
         NetworkServer.Spawn(instance);

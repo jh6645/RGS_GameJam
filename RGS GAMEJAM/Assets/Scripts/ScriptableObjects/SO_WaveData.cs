@@ -5,6 +5,5 @@ using UnityEngine;
 public class SO_WaveData : ScriptableObject
 {
     public float waveLength;
-    public float timeBetweenRandomSpawn;
     public EnemyData[] randomEnemies;
 }

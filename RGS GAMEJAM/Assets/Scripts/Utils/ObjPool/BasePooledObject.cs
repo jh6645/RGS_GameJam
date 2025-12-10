@@ -21,7 +21,7 @@ public class BasePooledObject : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcReturnToPool()
+    private void RpcReturnToPool()
     {
         OnDespawnFromPool();
         GameManager.Instance.poolManager.Return(originalPrefab, gameObject);

@@ -6,6 +6,7 @@ public class EnemyMeleeAttack : NetworkBehaviour
     private EnemyCore Core;
     private float lastAttackTime;
     private Transform target;
+    [SerializeField] private LayerMask targetLayerMask;
     private void Awake()
     {
         Core = GetComponent<EnemyCore>();
@@ -17,10 +18,9 @@ public class EnemyMeleeAttack : NetworkBehaviour
 
         target = Core.movement.currentTarget;
         if (target == null) return;
+        FindNearestTarget();
 
-        // 애니메이션 오면 수정해야함
-        float distance = Vector2.Distance(transform.position, target.position);
-        if (distance <= Core.enemyData.attackRange && Time.time >= lastAttackTime + Core.enemyData.attackCool)
+        if (Time.time >= lastAttackTime + Core.enemyData.attackCool)
         {
             PerformAttack();
         }
@@ -41,10 +41,34 @@ public class EnemyMeleeAttack : NetworkBehaviour
         RpcPlayAttackEffect();
     }
 
+    [Server]
+    private void FindNearestTarget()
+    {
+        target = null;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            transform.position,
+            Core.enemyData.attackRange,
+            targetLayerMask
+        );
+
+        float minDist = float.MaxValue;
+
+        foreach (var hit in hits)
+        {
+            float dist = Vector2.Distance(transform.position, hit.transform.position);
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                target = hit.transform;
+            }
+        }
+    }
+
     [ClientRpc]
     private void RpcPlayAttackEffect()
     {
-        Debug.Log("Enemy attacked (2D)!");
         //TODO: 애니메이션 추가하기
     }
     private void OnDrawGizmosSelected()

@@ -1,12 +1,19 @@
 using UnityEngine;
 using System.Collections;
-public class ChestInteraction : MonoBehaviour, IInteractable
+using Mirror;
+public class ChestInteraction : NetworkBehaviour, IInteractable
 {
     [Header("UI Prompt")]
     [SerializeField] private Transform appearTransform;
     [SerializeField] private bool useAppearTransform = true;
 
     [SerializeField] private float moveSpeed = 0.5f;
+
+    public GameObject Obj => gameObject;
+    [SyncVar] public bool isLocked;
+    public bool IsLocked { get => isLocked; set => isLocked = value; }
+    [SyncVar] private NetworkIdentity lockedBy;
+    public NetworkIdentity LockedBy { get => lockedBy; set => lockedBy = value; }
     public Transform AppearTransform => useAppearTransform && appearTransform != null ? appearTransform : transform;
     public bool isAppearTransform => useAppearTransform && appearTransform != null;
     public bool isRoomInteractor => false;
@@ -26,12 +33,13 @@ public class ChestInteraction : MonoBehaviour, IInteractable
 
         }
     }
-    public bool CanInteract()
+    public bool CanInteract(Interactor interactor)
     {
+        if (IsLocked) return false;
         return true;
     }
 
-    public bool Interact(Interactor interactor)
+    public bool InteractClient(Interactor interactor)
     {
         return true;
     }
@@ -68,5 +76,10 @@ public class ChestInteraction : MonoBehaviour, IInteractable
 
             CustomNetworkGamePlayer.localPlayer.CmdMoveResourceToGlobal();
         }
+    }
+    [Server]
+    public bool InteractServer(Interactor interactor)
+    {
+        return true;
     }
 }

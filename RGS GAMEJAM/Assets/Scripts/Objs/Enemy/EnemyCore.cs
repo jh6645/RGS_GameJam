@@ -9,5 +9,6 @@ public class EnemyCore : NetworkBehaviour
     public EnemyMovement movement;
     public EnemyMeleeAttack attack;
     public EnemyHealth health;
+    public PooledEnemy pooledEnemy;
 
 }

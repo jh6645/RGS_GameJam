@@ -22,8 +22,10 @@ public class PlayerMovement : NetworkBehaviour
     private Rigidbody2D rb;
     private Animator Anim;
     private PlayerInputHandler inputs;
+    private PlayerHealth playerHealth;
     private SpriteRenderer SR;
     private CustomNetworkGamePlayer player;
+    private Interactor interactor;
 
     private void Awake()
     {
@@ -31,6 +33,8 @@ public class PlayerMovement : NetworkBehaviour
         inputs = GetComponent<PlayerInputHandler>();
         Anim = GetComponentInChildren<Animator>();
         SR = GetComponentInChildren<SpriteRenderer>();
+        interactor = GetComponent<Interactor>();
+        playerHealth = GetComponent<PlayerHealth>();
         if (!isRoomPlayer)
         {
             player = GetComponent<CustomNetworkGamePlayer>();
@@ -43,7 +47,8 @@ public class PlayerMovement : NetworkBehaviour
         if (!isLocalPlayer) return;
         if (PlayerInputLock.IsLocked) return;
         if (!NetworkClient.ready) return;
-
+        if (interactor.GetHoldingState()) return;
+        if (playerHealth != null && playerHealth.isDead) return;
         Vector2 move = inputs.movementInput.normalized;
         //내꺼이동
         bool localWalking = !(move.x == 0 && move.y == 0);
@@ -56,7 +61,8 @@ public class PlayerMovement : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
-
+        if (interactor.GetHoldingState()) return;
+        if(playerHealth!=null&&playerHealth.isDead) return;
         Vector2 move = inputs.movementInput.normalized;
 
         if (move.x > 0.1f) SR.flipX = true;
@@ -71,6 +77,13 @@ public class PlayerMovement : NetworkBehaviour
             rb.MovePosition(rb.position + move * (player.playerTower.isMovingTower ? towerMoveSpeed : moveSpeed) * Time.fixedDeltaTime);
         }
 
+    }
+    public void SetVelocityZero()
+    {
+        if(!isLocalPlayer) return;  
+        rb.linearVelocity = Vector3.zero;
+        Anim.SetBool("isWalk", false);
+        CmdSendAnim(false, SR.flipX, 0, 0);
     }
 
     [Command]

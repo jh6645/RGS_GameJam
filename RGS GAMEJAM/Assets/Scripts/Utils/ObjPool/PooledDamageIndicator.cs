@@ -25,6 +25,10 @@ public class PooledDamageIndicator : BasePooledObject
     }
     public void OnFinishAnimation() 
     {
-        ServerDespawn(); 
+        if (isServer)
+        {
+            ServerDespawn();
+        }
+
     }
 }

@@ -116,7 +116,7 @@ public class GridRenderer : MonoBehaviour
         ApplyOffset();
     }
 
-    private Vector2 ToIsometric2D(Vector2 pos)
+    public Vector2 ToIsometric2D(Vector2 pos)
     {
         float isoX = pos.x + 2 * pos.y;
         float isoY = 2 * pos.y - pos.x;
@@ -124,7 +124,7 @@ public class GridRenderer : MonoBehaviour
     }
 
 
-    private Vector2 ToCartesian2D(float isoX, float isoY)
+    public Vector2 ToCartesian2D(float isoX, float isoY)
     {
         float cartX = (isoX - isoY) / 2f;
         float cartY = (isoX + isoY) / 4f;
@@ -144,6 +144,20 @@ public class GridRenderer : MonoBehaviour
         highlightInstance.transform.localPosition = new Vector2(snappedCart.x, snappedCart.y-0.5f);
 
         highlightInstance.SetActive(true);
+        return new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
+    }
+    public void UnHighlightCell()
+    {
+        highlightInstance.SetActive(false);
+    }
+    public Vector2Int CalcHighlightCell(Vector2 cartPos)
+    {
+        Vector2 isoPos = ToIsometric2D(cartPos);
+
+        float nearestIsoX = Mathf.CeilToInt(isoPos.x) + 0.5f;
+        float nearestIsoY = Mathf.CeilToInt(isoPos.y) + 0.5f;
+
+        Vector2 snappedCart = ToCartesian2D(nearestIsoX, nearestIsoY);
         return new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
     }
 }

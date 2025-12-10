@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1120894728695824572}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.077, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -492,6 +492,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &7470187077197275384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2526159165277980768}
+  m_Layer: 6
+  m_Name: ReviveInteracionPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2526159165277980768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7470187077197275384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 891981811833535625}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8137906984607410897
 GameObject:
   m_ObjectHideFlags: 0
@@ -526,8 +557,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.875}
-  m_SizeDelta: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.95}
+  m_SizeDelta: {x: 0.75, y: 0.75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &890406631950239781
 CanvasRenderer:
@@ -589,6 +620,7 @@ GameObject:
   - component: {fileID: 7600196819990560385}
   - component: {fileID: 1975245369292562829}
   - component: {fileID: 5927237105025106964}
+  - component: {fileID: 1864852684214811656}
   m_Layer: 6
   m_Name: GamePlayer
   m_TagString: Untagged
@@ -613,6 +645,7 @@ Transform:
   - {fileID: 5522926234706839063}
   - {fileID: 7207532486829482350}
   - {fileID: 5664302888731698610}
+  - {fileID: 2526159165277980768}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1218677228690415646
@@ -649,7 +682,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.032154024}
+  m_Offset: {x: 0, y: -0.2049473}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -659,7 +692,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.42402387, y: 0.70824075}
+  m_Size: {x: 0.42402387, y: 0.3626542}
   m_EdgeRadius: 0
 --- !u!50 &341667156520893021
 Rigidbody2D:
@@ -913,10 +946,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   interactionPos: {fileID: 7207532486829482350}
-  interactionRange: {x: 1, y: 1}
+  interactionRange: {x: 1.5, y: 1.5}
   interactionLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 384
   tapPromptPrefab: {fileID: 7017691658143864487, guid: 849e84aad928389489a6b018f0439e6e, type: 3}
   holdPromptPrefab: {fileID: 3454823008303893251, guid: 4166fb4a0ba47744da8effc48e051445, type: 3}
   isRoomInteract: 0
@@ -937,9 +970,9 @@ MonoBehaviour:
   syncInterval: 0
   characterACs:
   - {fileID: 9100000, guid: 481bd0b723b7ca94cb7dae96083f8c40, type: 2}
-  - {fileID: 0}
+  - {fileID: 9100000, guid: 007e257a867b2c545b9ce8ac9eaa786d, type: 2}
   - {fileID: 9100000, guid: f38ec307bc895ec498ef527cae05d66e, type: 2}
-  - {fileID: 0}
+  - {fileID: 9100000, guid: 1d8ca0e64c9ca4140a0d7c36dc4c362e, type: 2}
   playerNameTxt: {fileID: 5981953013357338149}
   playerNameColorList:
   - {r: 1, g: 0, b: 0, a: 1}
@@ -985,6 +1018,9 @@ MonoBehaviour:
   syncInterval: 0
   towerImg: {fileID: 2346789405177177392}
   isMovingTower: 0
+  nowTowerType: 0
+  isCellEmpty: 0
+  playerFollowingPrefab: {fileID: 4264943983299209084, guid: 609999ce4f192ff488c29fd23bd1062b, type: 3}
 --- !u!114 &5927237105025106964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,6 +1039,26 @@ MonoBehaviour:
   playerMaxHealth: 10
   playerHealthImg: {fileID: 6288499084405092469}
   dmgIndicatorPos: {fileID: 5664302888731698610}
+  playerReviveTime: 5
+  isDead: 0
+--- !u!114 &1864852684214811656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8255203102187795411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cdc95cf54bbb034f89f35fe12c47d43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReviveInteraction
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  appearTransform: {fileID: 2526159165277980768}
+  useAppearTransform: 1
+  isLocked: 0
 --- !u!1 &9149525343408179449
 GameObject:
   m_ObjectHideFlags: 0

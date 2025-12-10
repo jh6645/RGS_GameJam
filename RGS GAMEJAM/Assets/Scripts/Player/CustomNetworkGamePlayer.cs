@@ -130,6 +130,20 @@ public class CustomNetworkGamePlayer : NetworkBehaviour
         }
     }
     [Command]
+    public void CmdRemoveResource()
+    {
+        ServerRemoveResource();
+    }
+    [Server]
+    private void ServerRemoveResource()
+    {
+        if(GameManager.Instance.resourceManager.leaf > 0)
+        {
+            GameManager.Instance.resourceManager.ServerRemoveLeaf(1);
+        }
+    }
+
+    [Command]
     private void CmdSetIndex(int idx)
     {
         ServerSetIndex(idx);

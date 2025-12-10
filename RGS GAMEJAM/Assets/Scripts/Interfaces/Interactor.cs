@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+using System.Collections;
 public class Interactor : NetworkBehaviour
 {
     private PlayerInputHandler inputHandler;
@@ -13,6 +14,8 @@ public class Interactor : NetworkBehaviour
     [SerializeField] private GameObject tapPromptPrefab;
     [SerializeField] private GameObject holdPromptPrefab;
     private GameObject promptInstance;
+    private PlayerMovement PM;
+    private PlayerHealth PH;
 
     private IInteractable currentInteractable;
     private IInteractable previousInteractable;
@@ -26,6 +29,8 @@ public class Interactor : NetworkBehaviour
     private void Awake()
     {
         inputHandler = GetComponent<PlayerInputHandler>();
+        PM = GetComponent<PlayerMovement>();
+        PH = GetComponent<PlayerHealth>();
     }
 
     private void Update()
@@ -49,9 +54,9 @@ public class Interactor : NetworkBehaviour
             if (inputHandler.interactionJustPressed)
             {
                 if (isRoomInteract == currentInteractable.isRoomInteractor &&
-                    currentInteractable.CanInteract())
+                    currentInteractable.CanInteract(this))
                 {
-                    currentInteractable.Interact(this);
+                    CmdTryInteract(((Component)currentInteractable).gameObject);
                 }
             }
             return;
@@ -60,31 +65,49 @@ public class Interactor : NetworkBehaviour
         // HOLD Ã³¸®
         requiredHoldTime = currentInteractable.GetHoldTime();
 
+        if (!currentInteractable.CanInteract(this) && inputHandler.isInteractionPressed)
+        {
+            FailedHold(currentInteractable);
+            return;
+        }
+
         if (inputHandler.isInteractionPressed)
         {
             if (!isHolding)
             {
                 isHolding = true;
                 holdTimer = 0f;
+                PM.SetVelocityZero();
+                CmdRequestLock(((Component)currentInteractable).gameObject);
             }
 
             holdTimer += Time.deltaTime;
 
             UpdateHoldProgressUI(holdTimer / requiredHoldTime);
+            if (PH.isDead)
+            {
+                FailedHold(currentInteractable);
+            }
 
             if (holdTimer >= requiredHoldTime)
             {
-                currentInteractable.Interact(this);
+                CmdTryInteract(((Component)currentInteractable).gameObject);
                 isHolding = false;
                 holdTimer = 0f;
+                UpdateHoldProgressUI(0f);
             }
         }
-        else
+        if (inputHandler.interactionJustReleased)
         {
-            isHolding = false;
-            holdTimer = 0f;
-            UpdateHoldProgressUI(0f);
+            if (isHolding)
+            {
+                FailedHold(currentInteractable);
+            }
         }
+    }
+    public bool GetHoldingState()
+    {
+        return isHolding;
     }
     private void UpdateHoldProgressUI(float progress)
     {
@@ -93,6 +116,13 @@ public class Interactor : NetworkBehaviour
 
         var ui = promptInstance.GetComponent<InteractionPromptUI_Hold>();
         ui.SetFillAmount(Mathf.Clamp01(progress));
+    }
+    private void FailedHold(IInteractable II)
+    {
+        isHolding = false;
+        holdTimer = 0f;
+        CmdSetLocked(II.Obj, false);
+        UpdateHoldProgressUI(0f);
     }
     private void UpdateInteractable()
     {
@@ -122,7 +152,7 @@ public class Interactor : NetworkBehaviour
 
         if (currentInteractable != null)
         {
-            if (!currentInteractable.CanInteract())
+            if (!currentInteractable.CanInteract(this))
             {
                 HidePrompt();
             }
@@ -140,7 +170,7 @@ public class Interactor : NetworkBehaviour
 
     private void ShowPrompt(IInteractable target)
     {
-        if (!target.CanInteract())
+        if (!target.CanInteract(this))
         { 
             HidePrompt(); 
             return; 
@@ -156,7 +186,11 @@ public class Interactor : NetworkBehaviour
             HidePrompt();
             return;
         }
-
+        if (target.IsLocked && target.LockedBy != netIdentity)
+        {
+            HidePrompt();
+            return;
+        }
         if (promptInstance == null || currentType != target.GetInteractionType())
         {
             if (promptInstance != null)
@@ -199,22 +233,58 @@ public class Interactor : NetworkBehaviour
     private bool DoInteractionTest(out IInteractable interactable)
     {
         interactable = null;
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(interactionPos.position, interactionRange, 0, Vector2.right, 0, interactionLayer);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(interactionPos.position, interactionRange, 0, interactionLayer);
 
         float closestDist = float.MaxValue;
-        for (int i = 0; i < hits.Length; i++)
+        foreach (var col in hits)
         {
-            float dist = Vector2.Distance(transform.position, hits[i].transform.position);
+            float dist = Vector2.Distance(transform.position, col.transform.position);
             if (dist < closestDist)
             {
                 closestDist = dist;
-                interactable = hits[i].collider.GetComponent<IInteractable>();
+                interactable = col.GetComponent<IInteractable>();
             }
         }
 
         return interactable != null;
     }
+    [Command]
+    private void CmdTryInteract(GameObject target)
+    {
+        var interactable = target.GetComponent<IInteractable>();
+        if (interactable == null) return;
+        if (!interactable.CanInteract(this)) return;
 
+        interactable.InteractServer(this);
+        TargetRunClientInteract(connectionToClient, target);
+        interactable.IsLocked = false;
+    }
+    [Command]
+    private void CmdRequestLock(GameObject target)
+    {
+        var interactable = target.GetComponent<IInteractable>();
+
+        if (interactable == null) return;
+        if (interactable.IsLocked) return;
+        interactable.IsLocked = true;
+        interactable.LockedBy = connectionToClient.identity;
+    }
+    [Command]
+    public void CmdSetLocked(GameObject target, bool value)
+    {
+        var interactable = target.GetComponent<IInteractable>();
+        if (interactable == null) return;
+
+        interactable.IsLocked = value;
+    }
+    [TargetRpc]
+    private void TargetRunClientInteract(NetworkConnectionToClient conn, GameObject target)
+    {
+        var interactable = target.GetComponent<IInteractable>();
+        if (interactable == null) return;
+
+        interactable.InteractClient(this);
+    }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(interactionPos.position, interactionRange);

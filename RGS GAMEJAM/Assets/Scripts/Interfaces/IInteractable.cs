@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 public enum InteractionType
@@ -7,8 +8,12 @@ public enum InteractionType
 }
 public interface IInteractable
 {
-    public bool CanInteract();
-    public bool Interact(Interactor interactor);
+    GameObject Obj { get; }
+    public bool IsLocked { get; set; }
+    NetworkIdentity LockedBy { get; set;}
+    public bool CanInteract(Interactor interactor);
+    public bool InteractClient(Interactor interactor);
+    public bool InteractServer(Interactor interactor);
 
     public void OnEnterRange(Interactor interactor);
     public void OnExitRange(Interactor interactor);

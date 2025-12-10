@@ -823,6 +823,6 @@ MonoBehaviour:
   selectedCharacter: 0
   characterACs:
   - {fileID: 9100000, guid: 481bd0b723b7ca94cb7dae96083f8c40, type: 2}
-  - {fileID: 0}
+  - {fileID: 9100000, guid: 007e257a867b2c545b9ce8ac9eaa786d, type: 2}
   - {fileID: 9100000, guid: f38ec307bc895ec498ef527cae05d66e, type: 2}
-  - {fileID: 0}
+  - {fileID: 9100000, guid: 1d8ca0e64c9ca4140a0d7c36dc4c362e, type: 2}

@@ -75,7 +75,15 @@ public class EnemyMovement : NetworkBehaviour
 
         currentTarget = nearest;
     }
-
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!isServer) return;
+        if (collision.collider.CompareTag("mainTree"))
+        {
+            GameManager.Instance.mainTree.OnTreeAttacked(Core.health.currentHealth);
+            Core.pooledEnemy.ServerDespawn();
+        }
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
