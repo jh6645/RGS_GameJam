@@ -620,8 +620,8 @@ GameObject:
   - component: {fileID: 7600196819990560385}
   - component: {fileID: 1975245369292562829}
   - component: {fileID: 5927237105025106964}
-  - component: {fileID: -8192865659499936196}
-  - component: {fileID: 8309657050146360330}
+  - component: {fileID: 1864852684214811656}
+  - component: {fileID: 3702744080421585155}
   m_Layer: 6
   m_Name: GamePlayer
   m_TagString: Untagged
@@ -1042,7 +1042,7 @@ MonoBehaviour:
   dmgIndicatorPos: {fileID: 5664302888731698610}
   playerReviveTime: 5
   isDead: 0
---- !u!114 &-8192865659499936196
+--- !u!114 &1864852684214811656
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1060,7 +1060,7 @@ MonoBehaviour:
   appearTransform: {fileID: 2526159165277980768}
   useAppearTransform: 1
   isLocked: 0
---- !u!114 &8309657050146360330
+--- !u!114 &3702744080421585155
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
