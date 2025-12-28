@@ -4,6 +4,10 @@ public class PooledTower : BasePooledObject
 {
     public override void OnSpawnFromPool()
     {
-        GetComponent<BaseTower>().InitTower();
+        if (isServer)
+        {
+            GetComponent<BaseTower>().InitTower();
+        }
+
     }
 }

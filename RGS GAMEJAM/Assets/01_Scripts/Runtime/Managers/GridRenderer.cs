@@ -131,7 +131,7 @@ public class GridRenderer : MonoBehaviour
         return new Vector2(cartX, cartY);
     }
 
-    public Vector2Int HighlightCell(Vector2 cartPos)
+    public Vector2Int HighlightCell(Vector2 cartPos, Vector2Int playerPos, out bool outOfRange)
     {
         Vector2 isoPos = ToIsometric2D(cartPos);
 
@@ -142,8 +142,19 @@ public class GridRenderer : MonoBehaviour
 
         highlightInstance.transform.localPosition = new Vector2(snappedCart.x, snappedCart.y-0.5f);
 
+        Vector2Int isoHighlightPos = new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
+        if (Mathf.Abs(isoHighlightPos.x - playerPos.x) >= 3 || Mathf.Abs(isoHighlightPos.y - playerPos.y) >= 3)
+        {
+            highlightInstance.GetComponent<SpriteRenderer>().color = new Color(1, 0.29f, 0.29f, 0.63f);
+            outOfRange = true;
+        }
+        else
+        {
+            highlightInstance.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.63f);
+            outOfRange = false;
+        }
         highlightInstance.SetActive(true);
-        return new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
+        return isoHighlightPos;
     }
     public void UnHighlightCell()
     {

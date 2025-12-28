@@ -37,6 +37,8 @@ public class TowerManager : NetworkBehaviour
         Place(22, 22);
         //chest
         Place(26, 19);
+        //Composter
+        Place(29, 32);
     }
     [Server]
     public bool CanPlace(int x, int y)

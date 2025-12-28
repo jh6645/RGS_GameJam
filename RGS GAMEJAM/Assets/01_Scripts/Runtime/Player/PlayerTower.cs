@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Mirror;
 using NUnit.Framework.Constraints;
 using System.Collections;
+using Mirror.BouncyCastle.Asn1.BC;
 public class PlayerTower : NetworkBehaviour
 {
     [SerializeField] private Image towerImg;
@@ -10,42 +11,44 @@ public class PlayerTower : NetworkBehaviour
     [SyncVar(hook = nameof(OnTowerChanged))] public TowerType nowTowerType;
     [SyncVar] public bool isCellEmpty = false;
 
+    private Vector2Int occupiedCell;
     private Vector2Int selectedCell;
-    private Vector2Int lastSentCell = new Vector2Int(int.MinValue, int.MinValue);
+    private Vector2Int lastSentCell = new Vector2Int(0, 0);
 
     [SerializeField] private GameObject playerFollowingPrefab;
     private GameObject towerInteractionTrigger;
-    
+    private PlayerInputHandler playerInputHandler;
+
+    public bool isCellOutOfRange;
+    private void Awake()
+    {
+        playerInputHandler = GetComponent<PlayerInputHandler>();
+    }
     private void Start()
     {
         isTowerImgShowing(false);
     }
     private void Update()
     {
-        if (isLocalPlayer)
+        if (!isLocalPlayer) return;
+
+        if (isMovingTower)
         {
-            if (isMovingTower)
+            occupiedCell = GameManager.Instance.gridRenderer.CalcHighlightCell(new Vector2(transform.position.x, transform.position.y - 0.35f));
+
+            selectedCell = GameManager.Instance.gridRenderer.HighlightCell(playerInputHandler.GetMouseWorldPosition2D(), occupiedCell, out isCellOutOfRange);
+
+            if (selectedCell != lastSentCell)
             {
-                selectedCell = GameManager.Instance.gridRenderer.HighlightCell(new Vector2(transform.position.x, transform.position.y - 0.35f));
-                if (selectedCell != lastSentCell)
-                {
-                    lastSentCell = selectedCell;
-                    CmdCheckCell(selectedCell);
-                }
-            }
-            else
-            {
-                GameManager.Instance.gridRenderer.UnHighlightCell();
+                lastSentCell = selectedCell;
+                CmdSetSelectedCell(selectedCell);
+                CmdCheckCell(selectedCell);
             }
         }
         else
         {
-            if (isMovingTower&&isServer)
-            {
-                selectedCell= GameManager.Instance.gridRenderer.CalcHighlightCell(new Vector2(transform.position.x, transform.position.y - 0.35f));
-            }
+            GameManager.Instance.gridRenderer.UnHighlightCell();
         }
-
     }
     public void SetTowerTrigger(GameObject trigger)
     {
@@ -134,6 +137,11 @@ public class PlayerTower : NetworkBehaviour
     {
         bool empty = GameManager.Instance.towerManager.CanPlace(cell.x + 24, cell.y + 24);
         isCellEmpty = empty;
+    }
+    [Command]
+    private void CmdSetSelectedCell(Vector2Int cell)
+    {
+        selectedCell = cell;
     }
 
 }

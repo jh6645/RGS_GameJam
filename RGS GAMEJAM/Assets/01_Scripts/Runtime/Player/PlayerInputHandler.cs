@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     public Vector2 movementInput { get; private set; }
+    public Vector2 mouseScreenPosition { get; private set; }
     public bool isInteractionPressed { get; private set; }
     public bool interactionJustPressed { get; private set; }  // 눌린 순간
     public bool interactionJustReleased { get; private set; } // 뗀 순간
@@ -42,6 +43,19 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.started)
             toggleCameraPressed = true;
+    }
+    public void OnMousePosition(InputAction.CallbackContext context)
+    {
+        mouseScreenPosition = context.ReadValue<Vector2>();
+    }
+    public Vector2 GetMouseWorldPosition2D(Camera cam = null)
+    {
+        if (cam == null)
+            cam = Camera.main;
+
+        Vector3 worldPos = cam.ScreenToWorldPoint(mouseScreenPosition);
+        worldPos.z = 0f;
+        return worldPos;
     }
     private void LateUpdate()
     {

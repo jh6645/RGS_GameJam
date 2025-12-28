@@ -53,6 +53,7 @@ public class EnemyMovement : NetworkBehaviour
 
     private void UpdateAgroTarget()
     {
+        
         Transform nearest = null;
         float nearestDist = Mathf.Infinity;
 

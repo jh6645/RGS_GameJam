@@ -35,6 +35,7 @@ public class TowerPlaceInteraction : NetworkBehaviour, IInteractable
         if (!PT.isCellEmpty) return false;
         if (PT.netIdentity != interactor.netIdentity) return false;
         if(isMoving) return false;
+        if (PT.isCellOutOfRange) return false;
         return true;
     }
 
