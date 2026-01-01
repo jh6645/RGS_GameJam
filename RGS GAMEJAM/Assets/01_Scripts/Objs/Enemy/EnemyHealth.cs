@@ -28,7 +28,6 @@ public class EnemyHealth : NetworkBehaviour
         if (currentHealth <= 0)
         {
             isDead = true;
-            Core.movement.StopMove();
             RpcDeath();
         }
     }

@@ -13,8 +13,9 @@ public class PlayerHealth : NetworkBehaviour, IEnemyAttackable
     private BoxCollider2D playerCollider;
 
     [SyncVar(hook = nameof(OnPlayerHealthChanged))] private int playerHealth;
-    [SyncVar(hook =nameof(OnDeadChanged))]public bool isDead;
+    [SyncVar(hook =nameof(OnDeadChanged))]private bool _isDead;
 
+    public bool isDead { get => _isDead; set => _isDead = value; }
     private void Awake()
     {
         PM = GetComponent<PlayerMovement>();

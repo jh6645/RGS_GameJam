@@ -4,7 +4,9 @@ public class SO_BaseEnemy : ScriptableObject
 {
     [Header("Movement")]
     public float moveSpeed;
-    public float agroRange;
+    public float agroRange_Player;
+    public float agroFinishRange_Player;
+    public float agroRange_Tower;
     public LayerMask towerLayer;
     public LayerMask playerLayer;
     public bool isAgroTower;

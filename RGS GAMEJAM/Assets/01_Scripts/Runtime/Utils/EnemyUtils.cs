@@ -6,6 +6,14 @@ public enum EnemyType
 }
 
 [System.Serializable]
+public enum EnemyState
+{
+    Chasing_Tree,
+    Chasing_Target,
+    Chasing_Player,
+    Attacking,
+}
+[System.Serializable]
 public struct EnemyData
 {
     public EnemyType enemyType;

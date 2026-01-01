@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public TowerManager towerManager;
     public SpawnManager spawnManager;
     public PoolManager poolManager;
+    public PathFindingManager pathFindingManager;
 
     private void Awake()
     {

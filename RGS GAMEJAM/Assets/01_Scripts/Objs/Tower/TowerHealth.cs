@@ -8,6 +8,8 @@ public class TowerHealth : NetworkBehaviour,IEnemyAttackable
 
     [SerializeField] private Image towerHPImg;
     private BaseTower BT;
+    private bool _isDead;
+    public bool isDead { get => _isDead; set => _isDead = value; }
 
     private void Awake()
     {
@@ -17,14 +19,18 @@ public class TowerHealth : NetworkBehaviour,IEnemyAttackable
     {
         base.OnStartServer();
         currentHP = BT.towerData.towerMaxHP[0];
+        isDead = false;
     }
 
     [Server]
     public void TakeDamage(float damage)
     {
+        if (isDead) return;
+
         currentHP -= Mathf.CeilToInt(damage);
 
         if (currentHP <= 0) {
+            isDead = true;
             OnTowerDestroy();
         }
     }

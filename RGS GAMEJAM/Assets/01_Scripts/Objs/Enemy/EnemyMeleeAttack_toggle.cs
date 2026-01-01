@@ -5,8 +5,7 @@ public class EnemyMeleeAttack_toggle : NetworkBehaviour
 {
     private EnemyCore Core;
     private Transform target;
-
-    [SerializeField] private LayerMask targetLayerMask;
+    private EnemyState prevState;
 
     [SyncVar(hook = nameof(OnAttackStateChanged))] private bool isAttacking;
 
@@ -31,12 +30,19 @@ public class EnemyMeleeAttack_toggle : NetworkBehaviour
         if (FindNearestTarget())
         {
             isAttacking = true;
-            Core.movement.StopMove();
+            if (Core.enemyState != EnemyState.Attacking)
+            {
+                prevState = Core.enemyState;
+                Core.enemyState = EnemyState.Attacking;
+            }
         }
         else
         {
             isAttacking = false;
-            Core.movement.ReMove();
+            if (Core.enemyState == EnemyState.Attacking)
+            {
+                Core.enemyState = prevState;
+            }
         }
 
         if (attackTimer >= Core.enemyData.attackCool)
@@ -68,7 +74,7 @@ public class EnemyMeleeAttack_toggle : NetworkBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(
             transform.position,
             Core.enemyData.attackRange,
-            targetLayerMask
+            Core.enemyData.towerLayer|Core.enemyData.playerLayer
         );
 
         float minDist = float.MaxValue;
@@ -85,7 +91,6 @@ public class EnemyMeleeAttack_toggle : NetworkBehaviour
 
         return target != null;
     }
-
     [ClientRpc]
     private void RpcPlayAttackEffect()
     {
@@ -95,12 +100,5 @@ public class EnemyMeleeAttack_toggle : NetworkBehaviour
     private void OnAttackStateChanged(bool oldValue, bool newValue)
     {
         Core.animator.SetBool("isAttacking", newValue);
-    }
-    private void OnDrawGizmosSelected()
-    {
-        if (Core == null) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, Core.enemyData.attackRange);
     }
 }

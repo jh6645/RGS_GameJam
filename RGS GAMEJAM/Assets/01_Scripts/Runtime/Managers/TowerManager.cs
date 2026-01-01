@@ -7,6 +7,7 @@ public class TowerManager : NetworkBehaviour
     public Dictionary<TowerType, SO_BaseTower> towerDataDict = new Dictionary<TowerType, SO_BaseTower>();
 
     private bool[,] occupied = new bool[48, 48];
+    private BaseTower[,] towerDatas = new BaseTower[48, 48];
 
     private void Awake()
     {
@@ -26,19 +27,19 @@ public class TowerManager : NetworkBehaviour
     {
         base.OnStartServer();
         //workbench
-        Place(15, 23);
-        Place(15, 24);
-        Place(16, 23);
-        Place(16, 24);
+        Place(15, 23, null, false);
+        Place(15, 24, null, false);
+        Place(16, 23, null, false);
+        Place(16, 24, null, false);
         //tree
-        Place(21, 21);
-        Place(21, 22);
-        Place(22, 21);
-        Place(22, 22);
+        Place(21, 21, null, true);
+        Place(21, 22, null, true);
+        Place(22, 21, null, true);
+        Place(22, 22, null, true);
         //chest
-        Place(26, 19);
+        Place(26, 19, null, false);
         //Composter
-        Place(29, 32);
+        Place(29, 32, null, false);
     }
     [Server]
     public bool CanPlace(int x, int y)
@@ -49,21 +50,38 @@ public class TowerManager : NetworkBehaviour
     }
 
     [Server]
-    public void Place(int x, int y)
+    public void Place(int x, int y, BaseTower BT, bool isTree)
     {
         occupied[x, y] = true;
+        if (BT != null)
+        {
+            towerDatas[x, y] = BT;
+            GameManager.Instance.pathFindingManager.AddTowerNode(x, y, BT.towerData.towerWeight);
+        }
+        else
+        {
+            if (isTree)
+            {
+                GameManager.Instance.pathFindingManager.AddTowerNode(x, y, 1);
+            }
+            else
+            {
+                GameManager.Instance.pathFindingManager.AddWall(x, y);
+            }
+        }
     }
 
     [Server]
     public void Remove(int x, int y)
     {
         occupied[x, y] = false;
+        GameManager.Instance.pathFindingManager.RemoveNode(x, y);
     }
     [Server] 
     public void PlaceTower(int x, int y, TowerType type)
     {
-        Place(x+24, y+24);
         Vector2 cartesiancoord = GameManager.Instance.gridRenderer.ToCartesian2D(x+0.5f, y+0.5f);
-        GameManager.Instance.spawnManager.SpawnTower(type, new Vector2(cartesiancoord.x, cartesiancoord.y - 0.5f), new Vector2Int(x+24, y+24));
+        GameObject towerObj = GameManager.Instance.spawnManager.SpawnTower(type, new Vector2(cartesiancoord.x, cartesiancoord.y - 0.5f), new Vector2Int(x+24, y+24));
+        Place(x + 24, y + 24, towerObj.GetComponent<BaseTower>(),false);
     }
 }

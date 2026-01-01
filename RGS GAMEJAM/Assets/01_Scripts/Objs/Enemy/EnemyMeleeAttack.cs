@@ -16,8 +16,6 @@ public class EnemyMeleeAttack : NetworkBehaviour
     {
         if (!isServer) return;
 
-        target = Core.movement.currentTarget;
-        if (target == null) return;
         FindNearestTarget();
 
         if (Time.time >= lastAttackTime + Core.enemyData.attackCool)

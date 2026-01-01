@@ -170,4 +170,14 @@ public class GridRenderer : MonoBehaviour
         Vector2 snappedCart = ToCartesian2D(nearestIsoX, nearestIsoY);
         return new Vector2Int(Mathf.CeilToInt(isoPos.x), Mathf.CeilToInt(isoPos.y));
     }
+    public Vector2Int CalcHighlightCell_Array(Vector2 cartPos)
+    {
+        Vector2 isoPos = ToIsometric2D(cartPos);
+
+        float nearestIsoX = Mathf.CeilToInt(isoPos.x) + 0.5f;
+        float nearestIsoY = Mathf.CeilToInt(isoPos.y) + 0.5f;
+
+        Vector2 snappedCart = ToCartesian2D(nearestIsoX, nearestIsoY);
+        return new Vector2Int(Mathf.CeilToInt(isoPos.x)+24, Mathf.CeilToInt(isoPos.y)+24);
+    }
 }
