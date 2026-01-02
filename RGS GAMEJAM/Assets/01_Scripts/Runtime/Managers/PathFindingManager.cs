@@ -50,7 +50,6 @@ public class PathFindingManager : MonoBehaviour
 
     public List<Vector2Int> FindPath(Vector2Int start, Vector2Int end)
     {
-        Debug.Log(start+" "+end);
         if (start.x < 0 || end.x < 0 || start.x >= 48 || end.x >= 48)
         {
             return null;

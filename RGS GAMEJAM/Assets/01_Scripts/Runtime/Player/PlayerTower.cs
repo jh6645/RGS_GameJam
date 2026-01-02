@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
-using NUnit.Framework.Constraints;
-using System.Collections;
-using Mirror.BouncyCastle.Asn1.BC;
+using TMPro;
 public class PlayerTower : NetworkBehaviour
 {
     [SerializeField] private Image towerImg;
-    [SyncVar] public bool isMovingTower = false;
+    [SerializeField] private TMP_Text towerAmountTxt;
+    [SyncVar(hook =nameof(OnTowerAmountChanged))] public int holdingTowerAmount = 0;
     [SyncVar(hook = nameof(OnTowerChanged))] public TowerType nowTowerType;
     [SyncVar] public bool isCellEmpty = false;
 
@@ -20,6 +19,7 @@ public class PlayerTower : NetworkBehaviour
     private PlayerInputHandler playerInputHandler;
 
     public bool isCellOutOfRange;
+    public bool isMovingTower => holdingTowerAmount > 0;
     private void Awake()
     {
         playerInputHandler = GetComponent<PlayerInputHandler>();
@@ -42,7 +42,6 @@ public class PlayerTower : NetworkBehaviour
             {
                 lastSentCell = selectedCell;
                 CmdSetSelectedCell(selectedCell);
-                CmdCheckCell(selectedCell);
             }
         }
         else
@@ -70,7 +69,7 @@ public class PlayerTower : NetworkBehaviour
         towerInteractionTrigger.SetActive(true);
         GameManager.Instance.gridRenderer.ToggleGrid(true);
         towerInteractionTrigger.GetComponent<TowerPlaceInteraction>().SetTowerData(BT);
-        CmdAddTower(BT.towerType);
+        CmdAddTower(BT.towerType, BT.craftingAmount);
     }
     private bool isEnoughResources(SO_BaseTower BT)
     {
@@ -93,20 +92,20 @@ public class PlayerTower : NetworkBehaviour
     }
 
     [Command]
-    private void CmdAddTower(TowerType towerType) 
+    private void CmdAddTower(TowerType towerType, int towerAmount) 
     {
         nowTowerType = towerType;
-        isMovingTower = true;
+        holdingTowerAmount = towerAmount;
     }
     public void RemoveTower()
     {
-        if (!isMovingTower)
+        if (holdingTowerAmount == 1)
         {
-            return;
+            towerInteractionTrigger.SetActive(false);
+            GameManager.Instance.gridRenderer.ToggleGrid(false);
+            GameManager.Instance.gridRenderer.UnHighlightCell();
         }
-        towerInteractionTrigger.SetActive(false);
-        GameManager.Instance.gridRenderer.ToggleGrid(false);
-        GameManager.Instance.gridRenderer.UnHighlightCell();
+
         CmdRemoveTower();
 
     }
@@ -115,8 +114,11 @@ public class PlayerTower : NetworkBehaviour
     {
         Vector2Int towerPos = selectedCell;
         GameManager.Instance.towerManager.PlaceTower(towerPos.x, towerPos.y, nowTowerType);
-        isMovingTower = false;
-        nowTowerType = TowerType.NONE;
+        holdingTowerAmount -= 1;
+        if (!isMovingTower)
+        {
+            nowTowerType = TowerType.NONE;
+        }
     }
 
 
@@ -131,6 +133,23 @@ public class PlayerTower : NetworkBehaviour
             towerImg.sprite = null;
         }
         isTowerImgShowing(newValue!=TowerType.NONE);
+    }
+    private void OnTowerAmountChanged(int oldValue, int newValue)
+    {
+        if (newValue != 0)
+        {
+            towerAmountTxt.text = holdingTowerAmount.ToString();
+        }
+        else
+        {
+            towerAmountTxt.text = "";
+        }
+        
+    }
+    public bool CheckCellEmpty()
+    {
+        CmdCheckCell(selectedCell);
+        return isCellEmpty;
     }
     [Command]
     private void CmdCheckCell(Vector2Int cell)

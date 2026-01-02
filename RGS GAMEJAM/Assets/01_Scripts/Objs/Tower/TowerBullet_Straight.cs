@@ -3,7 +3,6 @@ using Mirror;
 
 public class TowerBullet : NetworkBehaviour
 {
-    [SerializeField] private Sprite bulletSprite;
     [SerializeField] private float speed;
 
     private float damage;
@@ -26,9 +25,9 @@ public class TowerBullet : NetworkBehaviour
     {
         if (!isServer) return;
 
-        if (!target.gameObject.activeSelf||target.gameObject.layer!=9)
+        if (!target.gameObject.activeSelf || target.gameObject.layer != 9)
         {
-           
+
             BPO.ServerDespawn();
             return;
         }

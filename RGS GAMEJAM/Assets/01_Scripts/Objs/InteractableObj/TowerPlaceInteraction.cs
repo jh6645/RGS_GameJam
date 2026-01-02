@@ -32,7 +32,7 @@ public class TowerPlaceInteraction : NetworkBehaviour, IInteractable
     }
     public bool CanInteract(Interactor interactor)
     {
-        if (!PT.isCellEmpty) return false;
+        if (!PT.CheckCellEmpty()) return false;
         if (PT.netIdentity != interactor.netIdentity) return false;
         if(isMoving) return false;
         if (PT.isCellOutOfRange) return false;

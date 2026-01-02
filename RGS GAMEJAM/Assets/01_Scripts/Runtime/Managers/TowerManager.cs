@@ -44,7 +44,7 @@ public class TowerManager : NetworkBehaviour
     [Server]
     public bool CanPlace(int x, int y)
     {
-        if (x < 0 || y < 0) return false;
+        if (x < 0 || y < 0 || x > 48 || y > 48) return false;
 
         return occupied[x, y] == false;
     }

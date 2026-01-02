@@ -97,8 +97,7 @@ public class SpawnManager : NetworkBehaviour
         var bullet = pool.Spawn(position, Quaternion.identity);
         NetworkServer.Spawn(bullet.gameObject);
 
-        bullet.GetComponent<TowerBullet>()
-              .SetBullet(target, damage);
+        bullet.GetComponent<TowerBullet_Bezier>().SetBullet(target, damage);
     }
     #endregion
 
