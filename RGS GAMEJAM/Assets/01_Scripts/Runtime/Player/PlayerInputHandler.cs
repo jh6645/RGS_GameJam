@@ -10,6 +10,10 @@ public class PlayerInputHandler : MonoBehaviour
     public bool interactionJustReleased { get; private set; } // ¶¾ ¼ø°£
     public float zoomInput { get; private set; }
     public bool toggleCameraPressed { get; private set; }
+    public bool rightClickPressed { get; private set; }
+    public bool rightClickJustPressed { get; private set; }
+    public bool rightClickJustReleased { get; private set; }
+    public bool isCtrlPressed { get; private set; }
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         movementInput = context.ReadValue<Vector2>();
@@ -48,6 +52,24 @@ public class PlayerInputHandler : MonoBehaviour
     {
         mouseScreenPosition = context.ReadValue<Vector2>();
     }
+    public void OnRightClick(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            rightClickJustPressed = true;
+            rightClickPressed = true;
+        }
+
+        if (context.canceled)
+        {
+            rightClickJustReleased = true;
+            rightClickPressed = false;
+        }
+    }
+    public void OnCtrl(InputAction.CallbackContext context)
+    {
+        isCtrlPressed = context.ReadValueAsButton();
+    }
     public Vector2 GetMouseWorldPosition2D(Camera cam = null)
     {
         if (cam == null)
@@ -61,6 +83,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         interactionJustPressed = false;
         interactionJustReleased = false;
+        rightClickJustPressed = false;
+        rightClickJustReleased = false;
         toggleCameraPressed = false;
         zoomInput = 0f;
     }

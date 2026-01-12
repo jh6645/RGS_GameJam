@@ -3,8 +3,8 @@ using UnityEngine;
 using Mirror;
 public class TowerManager : NetworkBehaviour
 {
-    [SerializeField] private SO_BaseTower[] towerDataArray;
-    public Dictionary<TowerType, SO_BaseTower> towerDataDict = new Dictionary<TowerType, SO_BaseTower>();
+    [SerializeField] private SO_MainTower[] towerDataArray;
+    public Dictionary<MainTowerType, SO_MainTower> towerDataDict = new Dictionary<MainTowerType, SO_MainTower>();
 
     private bool[,] occupied = new bool[48, 48];
     private BaseTower[,] towerDatas = new BaseTower[48, 48];
@@ -42,11 +42,22 @@ public class TowerManager : NetworkBehaviour
         Place(29, 32, null, false);
     }
     [Server]
-    public bool CanPlace(int x, int y)
+    public bool CanPlace(Vector2Int origin, Vector2Int[] shape, int rotation)
     {
-        if (x < 0 || y < 0 || x > 48 || y > 48) return false;
+        
+        foreach (var cell in shape)
+        {
+            Vector2Int rotated = GameManager.Instance.gridRenderer.Rotate(cell, rotation);
+            Vector2Int pos = origin + rotated;
+            pos.x += 24;
+            pos.y += 24;
+            if (pos.x < 0 || pos.y < 0 || pos.x >= 48 || pos.y >= 48)
+                return false;
 
-        return occupied[x, y] == false;
+            if (occupied[pos.x, pos.y])
+                return false;
+        }
+        return true;
     }
 
     [Server]
@@ -78,10 +89,11 @@ public class TowerManager : NetworkBehaviour
         GameManager.Instance.pathFindingManager.RemoveNode(x, y);
     }
     [Server] 
-    public void PlaceTower(int x, int y, TowerType type)
+    public void PlaceTower(int x, int y, MainTowerType type, int rotation)
     {
         Vector2 cartesiancoord = GameManager.Instance.gridRenderer.ToCartesian2D(x+0.5f, y+0.5f);
-        GameObject towerObj = GameManager.Instance.spawnManager.SpawnTower(type, new Vector2(cartesiancoord.x, cartesiancoord.y - 0.5f), new Vector2Int(x+24, y+24));
-        Place(x + 24, y + 24, towerObj.GetComponent<BaseTower>(),false);
+        GameObject towerObj = GameManager.Instance.spawnManager.SpawnTower(type, new Vector2(cartesiancoord.x, cartesiancoord.y - 0.5f));
+        towerObj.GetComponent<MainTower>().PlaceMainTower(new Vector2Int(x, y), rotation);
+        //Place(x + 24, y + 24, towerObj.GetComponent<BaseTower>(),false);
     }
 }

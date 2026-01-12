@@ -8,13 +8,15 @@ public class TowerInteractionUI : MonoBehaviour
     [SerializeField] private TMP_Text towerHPTxt;
     [SerializeField] private TMP_Text towerStuffTxt;
 
-    public void SetTower(BaseTower BT)
+    public void SetTower(MainTower MT)
     {
-        towerNameTxt.text = "LV" + (BT.towerLevel+1).ToString() + " " + BT.towerData.towerName;
-        towerHPTxt.text = BT.towerHealth.currentHP.ToString() + "/" + BT.towerData.towerMaxHP[BT.towerLevel].ToString();
-        if (BT.towerLevel <=3)
+        towerNameTxt.text = "LV" + (MT.towerLevel+1).ToString() + " " + MT.mainTowerData.towerName;
+        towerHPTxt.text = MT.towerHealth.currentHP.ToString() + "/" + MT.mainTowerData.towerMaxHP[MT.towerLevel].ToString();
+        if (MT.towerLevel <=3)
         {
-            towerStuffTxt.text = $"<color=green>{BT.towerData.upgradeStuffs[BT.towerLevel+1].needLeaf}</color>/<color=#925a02>{BT.towerData.upgradeStuffs[BT.towerLevel+1].needStick}</color>/<color=#5b5b5b>{BT.towerData.upgradeStuffs[BT.towerLevel+1].needStone}</color>";
+            towerStuffTxt.text = $"<color=green>{MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needLeaf}</color>/" +
+                $"<color=#925a02>{MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needStick}</color>/" +
+                $"<color=#5b5b5b>{MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needStone}</color>";
         }
         else
         {

@@ -2,28 +2,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using Unity.Services.Lobbies.Models;
-public class TowerHealth : NetworkBehaviour,IEnemyAttackable
+public class MainTowerHealth : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnHPAmountChanged))] public int currentHP;
 
     [SerializeField] private Image towerHPImg;
-    private BaseTower BT;
+    private MainTower MT;
     private bool _isDead;
     public bool isDead { get => _isDead; set => _isDead = value; }
 
     private void Awake()
     {
-        BT = GetComponent<BaseTower>();
+        MT = GetComponent<MainTower>();
     }
-    public override void OnStartServer()
+
+    [Server]
+    public void Init()
     {
-        base.OnStartServer();
-        currentHP = BT.towerData.towerMaxHP[0];
+        currentHP = MT.mainTowerData.towerMaxHP[0];
         isDead = false;
     }
 
     [Server]
-    public void TakeDamage(float damage)
+    public void MainTakeDamage(float damage)
     {
         if (isDead) return;
 
@@ -38,8 +39,8 @@ public class TowerHealth : NetworkBehaviour,IEnemyAttackable
     [Server]
     public void OnTowerDestroy()
     {
-        GameManager.Instance.towerManager.Remove(BT.GetTowerPos().x, BT.GetTowerPos().y);
-        BT.BPO.ServerDespawn();
+        MT.RemoveAllTower();
+        MT.BPO.ServerDespawn();
     }
     [Server]
     public void SetCurrentHP(int amount)
@@ -49,7 +50,7 @@ public class TowerHealth : NetworkBehaviour,IEnemyAttackable
     }
     private void OnHPAmountChanged(int oldValue, int newValue)
     {
-        towerHPImg.fillAmount = (float)newValue / BT.towerData.towerMaxHP[BT.towerLevel];
-        BT.towerInteraction.SetTower();
+        towerHPImg.fillAmount = (float)newValue / MT.mainTowerData.towerMaxHP[MT.towerLevel];
+        MT.towerInteraction.SetTower();
     }
 }

@@ -26,14 +26,14 @@ public class WorkbenchInteraction : NetworkBehaviour, IInteractable
     [SerializeField] private Transform content;
     [SerializeField] private GameObject towerUI;
 
-    private Dictionary<TowerType, bool> isRegisteredTowerDict;
+    private Dictionary<MainTowerType, bool> isRegisteredTowerDict;
    
 
     private void Awake()
     {
-        isRegisteredTowerDict = new Dictionary<TowerType, bool>();
+        isRegisteredTowerDict = new Dictionary<MainTowerType, bool>();
 
-        foreach (TowerType type in Enum.GetValues(typeof(TowerType)))
+        foreach (MainTowerType type in Enum.GetValues(typeof(MainTowerType)))
             isRegisteredTowerDict[type] = false;
 
 

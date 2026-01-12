@@ -74,7 +74,7 @@ public class SpawnManager : NetworkBehaviour
 
     #region Spawn Tower
     [Server]
-    public GameObject SpawnTower(TowerType type, Vector2 position, Vector2Int isoPos)
+    public GameObject SpawnTower(MainTowerType type, Vector2 position)
     {
         var prefab = towers[(int)type - 1];
         var pool = GameManager.Instance.poolManager.GetPool(prefab);
@@ -82,7 +82,6 @@ public class SpawnManager : NetworkBehaviour
         var tower = pool.Spawn(position, Quaternion.identity);
         NetworkServer.Spawn(tower.gameObject);
 
-        tower.GetComponent<BaseTower>().SetTowerPos(isoPos);
         return tower.gameObject;
     }
     #endregion

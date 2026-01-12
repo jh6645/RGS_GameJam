@@ -20,7 +20,7 @@ public class TowerAttack : NetworkBehaviour
     private void Start()
     {
         attackTowerData = (SO_BaseAttackTower)BT.towerData;
-        attackRangeObj.transform.localScale = Vector3.one * 2 * attackTowerData.attackRange[BT.towerLevel];
+        attackRangeObj.transform.localScale = Vector3.one * 2 * attackTowerData.attackRange[BT.mainTower.towerLevel];
         attackRangeObj.SetActive(false);
     }
 
@@ -42,9 +42,9 @@ public class TowerAttack : NetworkBehaviour
         Transform target = GetNearestEnemy();
         if (target == null) return;
 
-        float cool = attackTowerData.attackCool[BT.towerLevel];
+        float cool = attackTowerData.attackCool[BT.mainTower.towerLevel];
 
-        GameManager.Instance.spawnManager.SpawnBullet(prefabId, attackPosition.position,  attackTowerData.attackDamage[BT.towerLevel], target);
+        GameManager.Instance.spawnManager.SpawnBullet(prefabId, attackPosition.position,  attackTowerData.attackDamage[BT.mainTower.towerLevel], target);
 
         attackTimer = cool;
     }
@@ -52,7 +52,7 @@ public class TowerAttack : NetworkBehaviour
     [Server]
     private Transform GetNearestEnemy()
     {
-        float range = attackTowerData.attackRange[BT.towerLevel];
+        float range = attackTowerData.attackRange[BT.mainTower.towerLevel];
         float minDist = float.MaxValue;
         Transform nearest = null;
         int enemyLayer = LayerMask.NameToLayer("Enemy");
@@ -83,6 +83,6 @@ public class TowerAttack : NetworkBehaviour
         if (attackTowerData == null || BT == null) return;
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, attackTowerData.attackRange[BT.towerLevel]);
+        Gizmos.DrawWireSphere(transform.position, attackTowerData.attackRange[BT.mainTower.towerLevel]);
     }
 }

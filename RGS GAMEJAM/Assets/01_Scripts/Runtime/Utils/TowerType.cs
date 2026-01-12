@@ -1,11 +1,8 @@
 using UnityEngine;
-
-public enum TowerType
+public enum MainTowerType
 {
     NONE,
     WOOD_FENCE,
-    WOOD_CROSSBOW,
-    SPIKE_VINE,
-    DART_SHOOTER,
+    FIRELAUNCHER,
 
 }

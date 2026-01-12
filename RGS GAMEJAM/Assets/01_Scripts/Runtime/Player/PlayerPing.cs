@@ -44,61 +44,44 @@ public class PlayerPing : NetworkBehaviour
 
     private void HandlePingInput()
     {
-        // 디바이스 직접 읽기 (새 인풋 시스템 방식)
-        var keyboard = Keyboard.current;
-        var mouse = Mouse.current;
-        if (keyboard == null || mouse == null) return;
-
-        bool ctrlHeld =
-            (keyboard.leftCtrlKey != null && keyboard.leftCtrlKey.isPressed) ||
-            (keyboard.rightCtrlKey != null && keyboard.rightCtrlKey.isPressed);
-
-        // Ctrl 안 누르면 진행 중이던 핑도 취소
-        if (!ctrlHeld)
+        if (!inputHandler.isCtrlPressed)
         {
             if (isPinging)
                 CancelPing();
             return;
         }
 
-        // 1) Ctrl + 우클릭 눌렀을 때 시작
-        if (mouse.rightButton.wasPressedThisFrame)
+        // Ctrl + 우클릭 눌렀을 때
+        if (inputHandler.rightClickJustPressed)
         {
             isPinging = true;
-            startScreenPos = mouse.position.ReadValue();
+            startScreenPos = inputHandler.mouseScreenPosition;
             worldPingPos = ScreenToWorld(startScreenPos);
-            currentType = PingType.DefendMf; // 기본값
+            currentType = PingType.DefendMf;
 
-            if (pingWheelUI != null)
-                pingWheelUI.Open(startScreenPos);
+            pingWheelUI?.Open(startScreenPos);
         }
 
         if (!isPinging) return;
 
-        // 2) 드래그 방향에 따라 타입 선택
-        Vector2 currentPos = mouse.position.ReadValue();
+        Vector2 currentPos = inputHandler.mouseScreenPosition;
         Vector2 dir = currentPos - startScreenPos;
 
         if (dir.magnitude >= minDragDistance)
         {
             currentType = GetPingTypeFromDirection(dir);
-            if (pingWheelUI != null)
-                pingWheelUI.SetSelection(currentType);
+            pingWheelUI?.SetSelection(currentType);
         }
         else
         {
-            if (pingWheelUI != null)
-                pingWheelUI.ClearSelection();
+            pingWheelUI?.ClearSelection();
         }
 
-        // 3) 우클릭을 뗐을 때 확정 or 취소
-        if (mouse.rightButton.wasReleasedThisFrame)
+        // 우클릭 뗐을 때 확정
+        if (inputHandler.rightClickJustReleased)
         {
             if (dir.magnitude >= minDragDistance)
-            {
-                // 서버에 핑 요청
                 CmdSpawnPing(worldPingPos, currentType);
-            }
 
             CancelPing();
         }

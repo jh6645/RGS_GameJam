@@ -63,7 +63,7 @@ public class PlayerCameraController : NetworkBehaviour
 
         float scroll = inputHandler.zoomInput;
 
-        if (Mathf.Abs(scroll) > 0.01f)
+        if (Mathf.Abs(scroll) > 0.01f && inputHandler.isCtrlPressed)
         {
             float currentZoom = vcam.Lens.OrthographicSize;
             currentZoom -= scroll * zoomSpeed;

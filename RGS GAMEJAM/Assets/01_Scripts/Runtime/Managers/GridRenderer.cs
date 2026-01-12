@@ -180,4 +180,15 @@ public class GridRenderer : MonoBehaviour
         Vector2 snappedCart = ToCartesian2D(nearestIsoX, nearestIsoY);
         return new Vector2Int(Mathf.CeilToInt(isoPos.x)+24, Mathf.CeilToInt(isoPos.y)+24);
     }
+    public Vector2Int Rotate(Vector2Int v, int rotation)
+    {
+        return rotation switch
+        {
+            0 => v,
+            1 => new Vector2Int(-v.y, v.x),
+            2 => new Vector2Int(-v.x, -v.y),
+            3 => new Vector2Int(v.y, -v.x),
+            _ => v
+        };
+    }
 }

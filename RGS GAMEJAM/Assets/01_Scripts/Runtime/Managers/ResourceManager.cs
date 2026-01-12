@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class ResourceManager : NetworkBehaviour
 {
-    public class BluePrint : SyncDictionary<TowerType, bool> { }
+    public class BluePrint : SyncDictionary<MainTowerType, bool> { }
 
     [SyncVar(hook =nameof(OnChangeLeafAmount))] public int leaf;
     [SyncVar(hook = nameof(OnChangeStickAmount))] public int stick;
     [SyncVar(hook = nameof(OnChangeStoneAmount))] public int stone;
-     public readonly BluePrint bluePrints = new BluePrint();
+    public readonly BluePrint bluePrints = new BluePrint();
 
     [SerializeField] private TMP_Text leafAmountTxt;
     [SerializeField] private TMP_Text stickAmountTxt;
@@ -22,13 +22,13 @@ public class ResourceManager : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        foreach (TowerType type in Enum.GetValues(typeof(TowerType)))
+        foreach (MainTowerType type in Enum.GetValues(typeof(MainTowerType)))
         {
             if (!bluePrints.ContainsKey(type))
                 bluePrints.Add(type, false);
         }
-        bluePrints[TowerType.WOOD_CROSSBOW] = true;
-        bluePrints[TowerType.WOOD_FENCE] = true;
+        bluePrints[MainTowerType.WOOD_FENCE] = true;
+        bluePrints[MainTowerType.FIRELAUNCHER] = true;
     }
     public void OnChangeLeafAmount(int oldValue, int newValue)
     {
@@ -80,7 +80,7 @@ public class ResourceManager : NetworkBehaviour
     }
 
     [Server]
-    public void ServerUnlockBlueprint(TowerType type)
+    public void ServerUnlockBlueprint(MainTowerType type)
     {
         bluePrints[type] = true;
     }

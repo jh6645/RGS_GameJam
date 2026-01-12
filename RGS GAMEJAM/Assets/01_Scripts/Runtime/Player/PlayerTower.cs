@@ -2,12 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
+using UnityEngine.Windows;
 public class PlayerTower : NetworkBehaviour
 {
     [SerializeField] private Image towerImg;
     [SerializeField] private TMP_Text towerAmountTxt;
     [SyncVar(hook =nameof(OnTowerAmountChanged))] public int holdingTowerAmount = 0;
-    [SyncVar(hook = nameof(OnTowerChanged))] public TowerType nowTowerType;
+    [SyncVar(hook = nameof(OnTowerChanged))] public MainTowerType nowTowerType;
     [SyncVar] public bool isCellEmpty = false;
 
     private Vector2Int occupiedCell;
@@ -20,6 +21,8 @@ public class PlayerTower : NetworkBehaviour
 
     public bool isCellOutOfRange;
     public bool isMovingTower => holdingTowerAmount > 0;
+
+    private int currentRotation;
     private void Awake()
     {
         playerInputHandler = GetComponent<PlayerInputHandler>();
@@ -43,10 +46,26 @@ public class PlayerTower : NetworkBehaviour
                 lastSentCell = selectedCell;
                 CmdSetSelectedCell(selectedCell);
             }
+            HandleRotation();
         }
         else
         {
             GameManager.Instance.gridRenderer.UnHighlightCell();
+        }
+    }
+    private void HandleRotation()
+    {
+        float wheel = playerInputHandler.zoomInput;
+
+        if (Mathf.Abs(wheel) < 0.01f) return;
+
+        if (wheel > 0f)
+        {
+            currentRotation = (currentRotation + 1) % 4;
+        }
+        else
+        {
+            currentRotation = (currentRotation + 3) % 4;
         }
     }
     public void SetTowerTrigger(GameObject trigger)
@@ -61,7 +80,7 @@ public class PlayerTower : NetworkBehaviour
         color.a = isShowing ? 1 : 0;
         towerImg.color = color;
     }
-    public void AddTower(SO_BaseTower BT)
+    public void AddTower(SO_MainTower BT)
     {
         if (isMovingTower) return;
         if (!isEnoughResources(BT)) return;
@@ -71,7 +90,7 @@ public class PlayerTower : NetworkBehaviour
         towerInteractionTrigger.GetComponent<TowerPlaceInteraction>().SetTowerData(BT);
         CmdAddTower(BT.towerType, BT.craftingAmount);
     }
-    private bool isEnoughResources(SO_BaseTower BT)
+    private bool isEnoughResources(SO_MainTower BT)
     {
         ResourceManager RM = GameManager.Instance.resourceManager;
         return BT.upgradeStuffs[0].needLeaf <= RM.leaf &&
@@ -92,7 +111,7 @@ public class PlayerTower : NetworkBehaviour
     }
 
     [Command]
-    private void CmdAddTower(TowerType towerType, int towerAmount) 
+    private void CmdAddTower(MainTowerType towerType, int towerAmount) 
     {
         nowTowerType = towerType;
         holdingTowerAmount = towerAmount;
@@ -113,18 +132,18 @@ public class PlayerTower : NetworkBehaviour
     private void CmdRemoveTower()
     {
         Vector2Int towerPos = selectedCell;
-        GameManager.Instance.towerManager.PlaceTower(towerPos.x, towerPos.y, nowTowerType);
+        GameManager.Instance.towerManager.PlaceTower(towerPos.x, towerPos.y, nowTowerType, currentRotation);
         holdingTowerAmount -= 1;
         if (!isMovingTower)
         {
-            nowTowerType = TowerType.NONE;
+            nowTowerType = MainTowerType.NONE;
         }
     }
 
 
-    private void OnTowerChanged(TowerType oldValue, TowerType newValue)
+    private void OnTowerChanged(MainTowerType oldValue, MainTowerType newValue)
     {
-        if (newValue!=TowerType.NONE)
+        if (newValue!=MainTowerType.NONE)
         {
             towerImg.sprite = GameManager.Instance.towerManager.towerDataDict[newValue].towerIcon;
         }
@@ -132,7 +151,7 @@ public class PlayerTower : NetworkBehaviour
         {
             towerImg.sprite = null;
         }
-        isTowerImgShowing(newValue!=TowerType.NONE);
+        isTowerImgShowing(newValue != MainTowerType.NONE);
     }
     private void OnTowerAmountChanged(int oldValue, int newValue)
     {
@@ -148,13 +167,18 @@ public class PlayerTower : NetworkBehaviour
     }
     public bool CheckCellEmpty()
     {
-        CmdCheckCell(selectedCell);
+        if (nowTowerType == MainTowerType.NONE)
+        {
+            return false;
+        }
+        //이줄에서 클라이언트 타워 설치 시 Authority Warning이 남. 수정 필요
+        CmdCheckCell(selectedCell, GameManager.Instance.towerManager.towerDataDict[nowTowerType].cellPos, currentRotation);
         return isCellEmpty;
     }
     [Command]
-    private void CmdCheckCell(Vector2Int cell)
+    private void CmdCheckCell(Vector2Int origin, Vector2Int[] shape, int rotation)
     {
-        bool empty = GameManager.Instance.towerManager.CanPlace(cell.x + 24, cell.y + 24);
+        bool empty = GameManager.Instance.towerManager.CanPlace(origin, shape, rotation);
         isCellEmpty = empty;
     }
     [Command]

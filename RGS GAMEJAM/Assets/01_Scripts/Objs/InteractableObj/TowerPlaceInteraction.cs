@@ -19,20 +19,22 @@ public class TowerPlaceInteraction : NetworkBehaviour, IInteractable
     public string GetPromptText() => "타워 설치하기";
 
     private PlayerTower PT;
-    private SO_BaseTower towerData;
+    private SO_MainTower towerData;
     [HideInInspector] public bool isMoving;
 
     public void SetPlayerTower(PlayerTower playerTower)
     {
         this.PT = playerTower;
     }
-    public void SetTowerData(SO_BaseTower SO_towerData)
+    public void SetTowerData(SO_MainTower SO_towerData)
     {
         towerData = SO_towerData;
     }
     public bool CanInteract(Interactor interactor)
     {
-        if (!PT.CheckCellEmpty()) return false;
+        if (!PT.CheckCellEmpty()) {
+            return false;
+        }
         if (PT.netIdentity != interactor.netIdentity) return false;
         if(isMoving) return false;
         if (PT.isCellOutOfRange) return false;

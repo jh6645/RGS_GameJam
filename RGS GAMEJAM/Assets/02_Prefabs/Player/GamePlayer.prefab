@@ -983,6 +983,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: f30bb7ee-e631-43f5-8407-ae5c3610b34d
     m_ActionName: 'Gameplay/MousePosition[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4125635564062773773}
+        m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
+        m_MethodName: OnCtrl
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 417dcacd-7cd6-4ab6-ad29-2dac3c92d10f
+    m_ActionName: 'Gameplay/Ctrl[/Keyboard/ctrl]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4125635564062773773}
+        m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
+        m_MethodName: OnRightClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 85c2ab56-5b90-4b18-a5a5-fe2d86c0e1f5
+    m_ActionName: 'Gameplay/RightClick[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Gameplay

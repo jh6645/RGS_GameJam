@@ -4,21 +4,17 @@ using UnityEngine.UI;
 public class BaseTower : NetworkBehaviour
 {
     public SO_BaseTower towerData;
-    [SyncVar(hook = nameof(OnTowerLevelChanged))] public int towerLevel;
+    public MainTower mainTower;
 
-    [HideInInspector] public TowerInteraction towerInteraction;
-    [HideInInspector] public TowerHealth towerHealth;
     [HideInInspector] public TowerAttack towerAttack;
     [HideInInspector] public Animator animator;
-    [HideInInspector] public BasePooledObject BPO;
+    [HideInInspector] public ChildTowerHealth health;
     private Vector2Int towerPos;
     protected virtual void Awake()
     {
-        towerInteraction = GetComponent<TowerInteraction>();
-        towerHealth = GetComponent<TowerHealth>();
         animator = GetComponentInChildren<Animator>();
         towerAttack = GetComponent<TowerAttack>();
-        BPO= GetComponent<BasePooledObject>();
+        health = GetComponent<ChildTowerHealth>();
     }
     protected virtual void Start()
     {
@@ -27,42 +23,47 @@ public class BaseTower : NetworkBehaviour
     protected virtual void Update()
     {
     }
-    [Server]
-    public void InitTower()
-    {
-        towerLevel = 0;
-        animator.SetInteger("Level", towerLevel);
-        towerHealth.SetCurrentHP(towerData.towerMaxHP[towerLevel]);
-        towerInteraction.SetTower();
-    }
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        InitTower();
-    }
-    #region hook
 
-    private void OnTowerLevelChanged(int oldValue, int newValue)
-    {
-        towerInteraction.SetTower();
-    }
-    #endregion
     [Server]
-    public void AddTowerLevel()
+    public void AddChildTowerLevel()
     {
-        float towerHPratio = (float)towerHealth.currentHP / towerData.towerMaxHP[towerLevel];
-        towerLevel++;
-        animator.SetInteger("Level", towerLevel);
+        animator.SetInteger("Level", mainTower.towerLevel);
         animator.SetTrigger("LevelUp");
-        towerHealth.SetCurrentHP(Mathf.CeilToInt(towerHPratio * towerData.towerMaxHP[towerLevel]));
+    }
+    [Server]
+    public void InitChildTower()
+    {
+        health.SetDeadState(false);
+        animator.SetInteger("Level", mainTower.towerLevel);
+    }
+    public void InteractionEnterChildTower()
+    {
+        if (towerAttack != null)
+        {
+            towerAttack.SetRange(true);
+        }
+    }
+    public void InteractionExitChildTower()
+    {
+        if (towerAttack != null)
+        {
+            towerAttack.SetRange(false);
+        }
     }
     public void SetTowerPos(Vector2Int pos)
     {
         towerPos = pos;
+        Vector2 cartesiancoord = GameManager.Instance.gridRenderer.ToCartesian2D(pos.x + 0.5f, pos.y + 0.5f);
+        gameObject.transform.position = new Vector2(cartesiancoord.x, cartesiancoord.y - 0.5f);
+        if (isServer)
+        {
+            GameManager.Instance.towerManager.Place(pos.x + 24, pos.y + 24, this, false);
+        }
     }
-    public Vector2Int GetTowerPos()
+   
+    public void RemoveTower()
     {
-        return towerPos;
+        health.SetDeadState(true);
+        GameManager.Instance.towerManager.Remove(towerPos.x+24, towerPos.y+24);
     }
-
 }

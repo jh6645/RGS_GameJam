@@ -10,7 +10,7 @@ public class TowerInfoUI : MonoBehaviour
     [SerializeField] private TMP_Text towerStuff;
     [SerializeField] private Button towerMakeBtn;
 
-    public void SetTowerInfo(SO_BaseTower tower, UnityAction onMakeBtnClicked)
+    public void SetTowerInfo(SO_MainTower tower, UnityAction onMakeBtnClicked)
     {
         towerName.text = tower.towerName;
         towerInfo.text = tower.towerInfo;

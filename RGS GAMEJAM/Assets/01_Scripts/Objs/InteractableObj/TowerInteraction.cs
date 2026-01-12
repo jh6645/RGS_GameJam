@@ -16,20 +16,20 @@ public class TowerInteraction : NetworkBehaviour, IInteractable
     public bool isAppearTransform => useAppearTransform && appearTransform != null;
     public bool isRoomInteractor => false;
     public InteractionType GetInteractionType() => InteractionType.Hold;
-    public float GetHoldTime() => BT.towerData.placeTime;
+    public float GetHoldTime() => MT.mainTowerData.placeTime;
     public string GetPromptText() => "타워 업그레이드";
 
-    private BaseTower BT;
+    private MainTower MT;
     [SerializeField] private TowerInteractionUI towerUI;
     [SerializeField] private GameObject upgradePanel;
     private void Awake()
     {
-        BT = GetComponent<BaseTower>();
+        MT = GetComponentInParent<MainTower>();
     }
     public bool CanInteract(Interactor interactor)
     {
         if (IsLocked && lockedBy != interactor.netIdentity) return false;
-        if (BT.towerLevel >= 4) return false;
+        if (MT.towerLevel >= 4) return false;
         if (CanUpgradeResources())
         {
             return true;
@@ -44,15 +44,12 @@ public class TowerInteraction : NetworkBehaviour, IInteractable
 
     public void OnEnterRange(Interactor interactor)
     {
-        towerUI.SetTower(BT);
+        towerUI.SetTower(MT);
         if (upgradePanel != null)
         {
             upgradePanel.SetActive(true);
         }
-        if (BT.towerAttack != null)
-        {
-            BT.towerAttack.SetRange(true);
-        }
+        MT.InteractionEnterRange();
     }
 
     public void OnExitRange(Interactor interactor)
@@ -61,10 +58,7 @@ public class TowerInteraction : NetworkBehaviour, IInteractable
         {
             upgradePanel.SetActive(false);
         }
-        if (BT.towerAttack != null)
-        {
-            BT.towerAttack.SetRange(false);
-        }
+        MT.InteractionExitRange();
     }
 
     [Server]
@@ -75,22 +69,22 @@ public class TowerInteraction : NetworkBehaviour, IInteractable
             return false;
         }
         ResourceManager resourceManager = GameManager.Instance.resourceManager;
-        resourceManager.ServerRemoveLeaf(BT.towerData.upgradeStuffs[BT.towerLevel+1].needLeaf);
-        resourceManager.ServerRemoveStick(BT.towerData.upgradeStuffs[BT.towerLevel+1].needStick);
-        resourceManager.ServerRemoveStone(BT.towerData.upgradeStuffs[BT.towerLevel+1].needStone);
+        resourceManager.ServerRemoveLeaf(MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needLeaf);
+        resourceManager.ServerRemoveStick(MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needStick);
+        resourceManager.ServerRemoveStone(MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needStone);
 
-        BT.AddTowerLevel();
+        MT.AddTowerLevel();
         return true;
     }
     public void SetTower()
     {
-        towerUI.SetTower(BT);
+        towerUI.SetTower(MT);
     }
     private bool CanUpgradeResources()
     {
         ResourceManager resourceManager = GameManager.Instance.resourceManager;
-        return resourceManager.leaf >= BT.towerData.upgradeStuffs[BT.towerLevel+1].needLeaf &&
-            resourceManager.stick >= BT.towerData.upgradeStuffs[BT.towerLevel + 1].needStick &&
-            resourceManager.stone >= BT.towerData.upgradeStuffs[BT.towerLevel + 1].needStone;
+        return resourceManager.leaf >= MT.mainTowerData.upgradeStuffs[MT.towerLevel+1].needLeaf &&
+            resourceManager.stick >= MT.mainTowerData.upgradeStuffs[MT.towerLevel + 1].needStick &&
+            resourceManager.stone >= MT.mainTowerData.upgradeStuffs[MT.towerLevel + 1].needStone;
     }
 }
