@@ -27,7 +27,6 @@ public class CCManager : MonoBehaviour
     private void Start()
     {
         nowInfo.text = "";
-        directPanel.SetActive(false);
         RefreshServerList();
     }
     private void OnEnable()
